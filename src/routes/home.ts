@@ -16,15 +16,16 @@ export class GetHomePage extends ContextualHandler {
 
       // Fetch data stored in our SQLite
       const labels = await ctx.db
-        .selectFrom("label")
+        .selectFrom("labels")
         .selectAll()
         .orderBy("indexedAt", "desc")
         .limit(10)
         .execute();
 
       // Map user DIDs to their domain-name handles
+      // get dids for posts with labels
       // const didHandleMap = await ctx.resolver.resolveDidsToHandles(
-      //   statuses.map((s) => s.authorDid)
+      //   labels.map((s) => s.authorDid)
       // );
 
       // Fetch additional information about the logged-in user

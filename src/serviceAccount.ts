@@ -58,6 +58,8 @@ export class AtprotoServiceAccount {
         identifier: SVC_ACT_EMAIL,
         password: SVC_ACT_APP_PW,
       });
+    else
+      logger.warn("PUBLISH_TO_ATPROTO off, not logging in to service account");
 
     return new AtprotoServiceAccount(agent, db, logger);
   }
@@ -73,23 +75,28 @@ export class AtprotoServiceAccount {
 
   private async putRecord(record: Record, recordType: string, rkey: string) {
     let uri: string;
+    const req = {
+      repo: this.did(),
+      collection: recordType,
+      rkey,
+      record,
+      validate: false,
+    };
     if (env.PUBLISH_TO_ATPROTO) {
-      const res = await this.agent.com.atproto.repo.putRecord({
-        repo: this.did(),
-        collection: recordType,
-        rkey,
-        record,
-        validate: false,
-      });
+      const res = await this.agent.com.atproto.repo.putRecord(req);
       uri = res.data.uri;
     } else {
+      this.logger.warn(
+        req,
+        "PUBLISH_TO_ATPROTO off, would have published this record"
+      );
       uri = uuid();
     }
     return uri;
   }
 
   async publishLabel(label: string, subject: string) {
-    // Construct & validate their status record
+    // Construct & validate label record
     const recordType = "com.atproto.label.defs#label";
     const rkey = TID.nextStr();
     const record = {
@@ -113,7 +120,7 @@ export class AtprotoServiceAccount {
       // handled in #/firehose/ingestor.ts, but it ensures that future reads
       // will be up-to-date after this method finishes.
       await this.db
-        .insertInto("label")
+        .insertInto("labels")
         .values({
           uri,
           src: record.src,
@@ -133,7 +140,7 @@ export class AtprotoServiceAccount {
 
   private async labelExists(labelUri: string) {
     const row = await this.db
-      .selectFrom("label")
+      .selectFrom("labels")
       .select("uri")
       .where("uri", "=", labelUri)
       .executeTakeFirst();

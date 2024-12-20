@@ -10,8 +10,8 @@ import {
 // Types
 
 export type DatabaseSchema = {
-  label: Label;
-  votes: VoteTable;
+  labels: Label;
+  votes: Vote;
   auth_session: AuthSession;
   auth_state: AuthState;
 };
@@ -25,7 +25,7 @@ export type Label = {
   indexedAt: string;
 };
 
-export type VoteTable = {
+export type Vote = {
   uri: string;
   src: string;
   val: 1 | -1;
@@ -61,7 +61,7 @@ const migrationProvider: MigrationProvider = {
 migrations["001"] = {
   async up(db: Kysely<unknown>) {
     await db.schema
-      .createTable("label")
+      .createTable("labels")
       .addColumn("uri", "varchar", (col) => col.primaryKey())
       .addColumn("src", "varchar", (col) => col.notNull())
       .addColumn("val", "varchar", (col) => col.notNull())
@@ -92,7 +92,8 @@ migrations["001"] = {
   async down(db: Kysely<unknown>) {
     await db.schema.dropTable("auth_state").execute();
     await db.schema.dropTable("auth_session").execute();
-    await db.schema.dropTable("status").execute();
+    await db.schema.dropTable("labels").execute();
+    await db.schema.dropTable("votes").execute();
   },
 };
 
