@@ -24,7 +24,8 @@ export class GetLabelsCreate extends ContextualHandler {
 export class GetLabel extends ContextualHandler {
   constructor(ctx: AppContext) {
     super(ctx, async (req, res) => {
-      ctx.logger.trace(req, "got request to GET /label/:uri");
+      ctx.logger.trace(req.params, "got request to GET /label/:uri");
+      ctx.logger.trace(req.query, "req.query");
       const agent = await getSessionAgent(req, res, ctx);
       if (!agent || !agent.did) return res.sendStatus(403);
 
@@ -114,7 +115,7 @@ export class PostLabel extends ContextualHandler {
         }
 
         if (e instanceof LabelExists) {
-          return res.redirect(`/label/${e.existingUri}`);
+          return res.redirect(`/label/${e.existingUri}?error=exists`);
         }
 
         return res.type("html").send(
