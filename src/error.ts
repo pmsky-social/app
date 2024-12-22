@@ -15,3 +15,9 @@ export class InvalidVote extends Error {
     super(`Invalid vote value, expected +/- 1: ${vote}`);
   }
 }
+
+export class AlreadyVoted extends Error {
+  constructor(labelUri: string) {
+    super(`User tried to vote twice on label: ${labelUri}`);
+  }
+}
