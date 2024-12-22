@@ -24,12 +24,14 @@ This means that you cannot change your vote once you've cast it.
 
 ## Current status:
 - [x] create a label
-- [ ] vote on a label
+- [x] vote on a label
     - [ ] lexicon
-    - [ ] UI
-    - [ ] routes
-- [ ] records are published to at proto in the service acct's PDS 
-- [~] watch the firehose for labels published to pmsky pds
+    - [x] UI
+    - [x] routes
+- [ ] better label UI (show actual post, context?)
+- [x] records are published to at proto in the service acct's PDS 
+- [x] watch the firehose for labels published to pmsky pds
+- [ ] hydration so voting only refreshes that label component, rather than the whole page.
 - [ ] sorting existing labels
 - [ ] when creating a label, if it already exists, gracefully link to the existing label rather than creating a duplicate
 - [ ] messaging around how labels don't belong to you, and cannot be deleted
