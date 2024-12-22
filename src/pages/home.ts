@@ -37,7 +37,11 @@ function content({ labels, profile }: Props) {
 }
 
 function createLabelLink() {
-  return html`<p><a href="/labels/create">Create a new label</a></p>`;
+  return html`<p>
+    <a href="/labels/create"
+      ><button title="Create a new label">Create</button></a
+    >
+  </p>`;
 }
 
 function toBskyLink(did: string) {
