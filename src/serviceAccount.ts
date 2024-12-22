@@ -11,7 +11,12 @@ import { env } from "#/lib/env";
 import { SvcActCredsStore } from "./auth/storage";
 import { SVC_ACT_SESSION_KEY } from "./constants";
 import type { Database } from "./db";
-import { InvalidRecord, InvalidVote, LabelNotFound } from "./error";
+import {
+  AlreadyVoted,
+  InvalidRecord,
+  InvalidVote,
+  LabelNotFound,
+} from "./error";
 import { validateLabel } from "./lexicon/types/com/atproto/label/defs";
 
 ///
@@ -53,13 +58,10 @@ export class AtprotoServiceAccount {
       },
     });
 
-    if (env.PUBLISH_TO_ATPROTO)
-      await agent.login({
-        identifier: SVC_ACT_EMAIL,
-        password: SVC_ACT_APP_PW,
-      });
-    else
-      logger.warn("PUBLISH_TO_ATPROTO off, not logging in to service account");
+    await agent.login({
+      identifier: SVC_ACT_EMAIL,
+      password: SVC_ACT_APP_PW,
+    });
 
     return new AtprotoServiceAccount(agent, db, logger);
   }
@@ -69,6 +71,9 @@ export class AtprotoServiceAccount {
   }
 
   did() {
+    if (!this.agent.did) {
+      this.logger.warn("No DID for service account when requested");
+    }
     assert(this.agent.did);
     return this.agent.did;
   }
@@ -107,7 +112,9 @@ export class AtprotoServiceAccount {
       cts: new Date().toISOString(),
     };
 
-    if (!validateLabel(record).success) {
+    const validationResult = validateLabel(record);
+    if (!validationResult.success) {
+      this.logger.error(validationResult, "invalid label record: ");
       throw new InvalidRecord(recordType);
     }
 
@@ -148,9 +155,26 @@ export class AtprotoServiceAccount {
     return row !== undefined;
   }
 
+  private async userVotedAlready(
+    userDid: string,
+    labelUri: string
+  ): Promise<boolean> {
+    return (
+      (await this.db
+        .selectFrom("votes")
+        .selectAll()
+        .where("src", "=", userDid)
+        .where("subject", "=", labelUri)
+        .executeTakeFirst()) !== undefined
+    );
+  }
+
   async publishVote(vote: 1 | -1, labelUri: string, userDid: string) {
+    this.logger.trace({ vote, labelUri, userDid }, "svc act publish vote");
     // check that labelUri exists in DB, if not throw error
     if (!(await this.labelExists(labelUri))) throw new LabelNotFound(labelUri);
+    if (await this.userVotedAlready(userDid, labelUri))
+      throw new AlreadyVoted(labelUri);
     if (vote !== 1 && vote !== -1) throw new InvalidVote(vote);
 
     const recordType = "social.pmsky.label.vote";
@@ -158,7 +182,7 @@ export class AtprotoServiceAccount {
     const record = {
       $type: recordType,
       src: this.did(),
-      uri: labelUri, // TODO: see line 98
+      uri: labelUri, // TODO: see publishLabel
       val: vote,
       cts: new Date().toISOString(),
     };
@@ -170,7 +194,6 @@ export class AtprotoServiceAccount {
         .values({
           uri: voteRecordUri,
           src: userDid,
-          val: record.val,
           subject: record.uri,
           createdAt: record.cts,
           indexedAt: new Date().toISOString(),
