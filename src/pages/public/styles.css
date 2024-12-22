@@ -5,6 +5,7 @@ body {
   --gray-100: #fafafa;
   --gray-500: #666;
   --gray-700: #333;
+  --black: #000;
   --primary-100: #d2e7ff;
   --primary-200: #b1d3fa;
   --primary-400: #2e8fff;
@@ -157,4 +158,9 @@ form {
   text-align: center;
   text-wrap: balance;
   margin-top: 1rem;
+}
+
+h1>a {
+  color: var(--gray-700);
+  /* text-decoration: none; */
 }

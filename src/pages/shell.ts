@@ -19,7 +19,7 @@ export function shell({
     <body>
       <div class="error"></div>
       <div id="header">
-        <h1>${header}</h1>
+        <h1><a href="/">${header}</a></h1>
         <p>${subheader}</p>
       </div>
       <div id="content">${content}</div>
