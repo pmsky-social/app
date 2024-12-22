@@ -7,6 +7,7 @@ export type HomepageLabel = {
   val: string;
   subject: string;
   voted: boolean;
+  score: number;
   createdAt: string;
   indexedAt: string;
 };

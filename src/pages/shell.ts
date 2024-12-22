@@ -15,8 +15,8 @@ export function shell({
   msg?: string | Hole;
   content: Hole;
 }) {
-  const errorClass = msg !== "" ? "error visible" : "error";
-  const hasPrev = path.length > 0;
+  const errorClass = msg ? "error visible" : "error";
+  const hasPrev = path.length > 0 && path[0] !== "login";
   let prevDest;
   if (hasPrev) {
     prevDest = `/${path.slice(0, -1).join("/")}`;

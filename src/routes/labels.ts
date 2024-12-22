@@ -34,14 +34,15 @@ export class GetLabel extends ContextualHandler {
       const label = await new LabelRepository(ctx.db).getLabel(req.params.uri);
       if (!label) return res.sendStatus(404);
 
-      const voted = await new VoteRepository(ctx.db).userVotedAlready(
-        agent.did,
-        label.uri
-      );
+      const votes = new VoteRepository(ctx.db);
+      const voted = await votes.userVotedAlready(agent.did, label.uri);
+
+      const score = await votes.getLabelScore(label.uri);
 
       const hydrated: HomepageLabel = {
         ...label,
         voted,
+        score,
       };
       return res
         .type("html")

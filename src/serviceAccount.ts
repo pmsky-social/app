@@ -20,6 +20,7 @@ import {
   LabelNotFound,
 } from "./error";
 import { validateLabel } from "./lexicon/types/com/atproto/label/defs";
+import { VoteRepository } from "./db/voteRepository";
 
 ///
 /// this agent is used to perform actions on behalf of the platform,
@@ -177,7 +178,7 @@ export class AtprotoServiceAccount {
     labelValue?: string;
     subject?: string;
   }): Promise<boolean> {
-    let query = await this.db.selectFrom("labels").select("uri");
+    let query = this.db.selectFrom("labels").select("uri");
 
     if (labelUri) {
       query = query.where("uri", "=", labelUri);
@@ -198,7 +199,7 @@ export class AtprotoServiceAccount {
   ): Promise<boolean> {
     return (
       (await this.db
-        .selectFrom("votes")
+        .selectFrom("user_votes")
         .selectAll()
         .where("src", "=", userDid)
         .where("subject", "=", labelUri)
@@ -227,16 +228,13 @@ export class AtprotoServiceAccount {
     const voteRecordUri = await this.putRecord(record, recordType, rkey);
 
     try {
-      await this.db
-        .insertInto("votes")
-        .values({
-          uri: voteRecordUri,
-          src: userDid,
-          subject: record.uri,
-          createdAt: record.cts,
-          indexedAt: new Date().toISOString(),
-        })
-        .execute();
+      await new VoteRepository(this.db).saveVote(
+        userDid,
+        labelUri,
+        vote,
+        voteRecordUri,
+        record.cts
+      );
     } catch (err) {
       this.logger.warn(
         { err },

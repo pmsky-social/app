@@ -11,7 +11,8 @@ import {
 
 export type DatabaseSchema = {
   labels: Label;
-  votes: Vote;
+  user_votes: UserVote; // keeps track of which users voted
+  label_votes: LabelVote; // keeps track of vote values, these are separate for anonymity
   auth_session: AuthSession;
   auth_state: AuthState;
 };
@@ -25,11 +26,21 @@ export type Label = {
   indexedAt: string;
 };
 
-export type Vote = {
-  uri: string; // URI of the vote
+// this struct only tracks the labels and voters, no vote values or record URIs
+export type UserVote = {
+  // uri: string; // URI of the vote
   src: string; // who voted
-  // val: 1 | -1; // we don't save how they voted
+  // val: 1 | -1; // we don't save how they voted in this table
   subject: string; // the URI of the resource this vote applies to
+  createdAt: string;
+  indexedAt: string;
+};
+
+// this struct more closely matches the ATP records
+export type LabelVote = {
+  uri: string; // URI of the vote
+  val: 1 | -1; // vote direction
+  subject: string; // URI of the label voted on
   createdAt: string;
   indexedAt: string;
 };
@@ -70,10 +81,17 @@ migrations["001"] = {
       .addColumn("indexedAt", "varchar", (col) => col.notNull())
       .execute();
     await db.schema
-      .createTable("votes")
-      .addColumn("uri", "varchar", (col) => col.primaryKey())
+      .createTable("user_votes")
       .addColumn("src", "varchar", (col) => col.notNull())
       .addColumn("subject", "varchar", (col) => col.notNull())
+      .addColumn("createdAt", "varchar", (col) => col.notNull())
+      .addColumn("indexedAt", "varchar", (col) => col.notNull())
+      .execute();
+    await db.schema
+      .createTable("label_votes")
+      .addColumn("uri", "varchar", (col) => col.primaryKey())
+      .addColumn("val", "varchar", (col) => col.notNull())
+      .addColumn("subject", "varchar", (col) => col.notNull()) // todo: foreign key?
       .addColumn("createdAt", "varchar", (col) => col.notNull())
       .addColumn("indexedAt", "varchar", (col) => col.notNull())
       .execute();
@@ -92,7 +110,8 @@ migrations["001"] = {
     await db.schema.dropTable("auth_state").execute();
     await db.schema.dropTable("auth_session").execute();
     await db.schema.dropTable("labels").execute();
-    await db.schema.dropTable("votes").execute();
+    await db.schema.dropTable("user_votes").execute();
+    await db.schema.dropTable("label_votes").execute();
   },
 };
 

@@ -7,6 +7,7 @@ export function labelCard(label: HomepageLabel) {
       <p>${label.val}</p>
       <p>${label.subject}</p>
       <p>${ts(label)}</p>
+      <p>${score(label)}</p>
       <p>${voting(label)}</p>
     </div>
   `;
@@ -17,6 +18,11 @@ function ts(label: HomepageLabel) {
   const indexedAt = new Date(label.indexedAt);
   if (createdAt < indexedAt) return createdAt.toDateString();
   return indexedAt.toDateString();
+}
+
+function score(label: HomepageLabel) {
+  const score = Math.floor(label.score);
+  return html`<div class="score">${score}</div>`;
 }
 
 function voting(label: HomepageLabel) {

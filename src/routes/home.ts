@@ -6,6 +6,7 @@ import { home } from "#/pages/home";
 import type { AppContext } from "..";
 import { ContextualHandler } from "./ContextualHandler";
 import { getSessionAgent } from "./util";
+import { VoteRepository } from "#/db/voteRepository";
 
 export class GetHomePage extends ContextualHandler {
   constructor(ctx: AppContext) {
@@ -62,7 +63,7 @@ export class GetHomePage extends ContextualHandler {
     const labelUris = labels.map((s) => s.uri);
     this.ctx.logger.trace(labelUris, "fetched labels for route /home");
     const alreadyVoted = await this.ctx.db
-      .selectFrom("votes")
+      .selectFrom("user_votes")
       .select("subject")
       .where("src", "=", agent.assertDid)
       .where("subject", "in", labelUris)
@@ -73,12 +74,19 @@ export class GetHomePage extends ContextualHandler {
       "fetched which votes already happened for route /home"
     );
 
+    const scores = await new VoteRepository(this.ctx.db).getLabelScores(
+      labelUris
+    );
+
+    this.ctx.logger.trace(scores, "fetched scores for labels");
+
     return labels.map((l) => {
       return {
         uri: l.uri,
         val: l.val,
         subject: l.subject,
         voted: alreadyVoted.some((v) => v.subject === l.uri),
+        score: scores[l.uri] || 0,
         createdAt: l.createdAt,
         indexedAt: l.indexedAt,
       };
