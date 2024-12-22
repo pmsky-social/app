@@ -17,19 +17,19 @@ export type DatabaseSchema = {
 };
 
 export type Label = {
-  uri: string;
-  src: string;
-  val: string;
-  subject: string;
+  uri: string; // record ID (produced by ATProto)
+  src: string; // who created the label (always the service act did)
+  val: string; // the label itself
+  subject: string; // the URI of the resource this label applies to
   createdAt: string;
   indexedAt: string;
 };
 
 export type Vote = {
-  uri: string;
-  src: string;
-  val: 1 | -1;
-  subject: string;
+  uri: string; // URI of the vote
+  src: string; // who voted
+  // val: 1 | -1; // we don't save how they voted
+  subject: string; // the URI of the resource this vote applies to
   createdAt: string;
   indexedAt: string;
 };
@@ -73,7 +73,6 @@ migrations["001"] = {
       .createTable("votes")
       .addColumn("uri", "varchar", (col) => col.primaryKey())
       .addColumn("src", "varchar", (col) => col.notNull())
-      .addColumn("val", "boolean", (col) => col.notNull())
       .addColumn("subject", "varchar", (col) => col.notNull())
       .addColumn("createdAt", "varchar", (col) => col.notNull())
       .addColumn("indexedAt", "varchar", (col) => col.notNull())
