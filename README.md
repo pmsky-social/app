@@ -29,12 +29,14 @@ This means that you cannot change your vote once you've cast it.
     - [x] UI
     - [x] routes
 - [ ] better label UI (show actual post, context?)
+    - [x] show label score
+    - [ ] show number of votes too?
 - [x] records are published to at proto in the service acct's PDS 
 - [x] watch the firehose for labels published to pmsky pds
-- [ ] create a generic "server message" thing to handle responses.  maybe end up using more ajax calls than plain html
+- [~] create a generic "server message" thing to handle responses.  maybe end up using more ajax calls than plain html
 - [ ] hydration so voting only refreshes that label component, rather than the whole page.
 - [ ] sorting existing labels
-- [ ] when creating a label, if it already exists, gracefully link to the existing label rather than creating a duplicate
+- [x] when creating a label, if it already exists, gracefully link to the existing label rather than creating a duplicate
 - [ ] messaging around how labels don't belong to you, and cannot be deleted
 - [ ] settings page for vote publicity
 - [ ] allow public votes (published to user's own PDS)
