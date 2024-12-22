@@ -4,8 +4,11 @@ import { html } from "#/lib/view";
 export function labelCard(label: HomepageLabel) {
   return html`
     <div class="card">
-      <p>${label.val}</p>
-      <p>${label.subject}</p>
+      <div class="card-header">
+        <p class="label-value">${label.val}</p>
+        <p class="label-subject">${label.subject}</p>
+      </div>
+      ${label.embed}
       <p>${ts(label)}</p>
       <p>${score(label)}</p>
       <p>${voting(label)}</p>

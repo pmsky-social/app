@@ -145,7 +145,7 @@ export class AtprotoServiceAccount {
           uri,
           src: record.src,
           val: record.val,
-          subject: record.uri,
+          subject,
           createdAt: record.cts,
           indexedAt: new Date().toISOString(),
         })

@@ -84,6 +84,7 @@ export class GetHomePage extends ContextualHandler {
       return {
         uri: l.uri,
         val: l.val,
+        author: l.author,
         subject: l.subject,
         voted: alreadyVoted.some((v) => v.subject === l.uri),
         score: scores[l.uri] || 0,

@@ -22,6 +22,7 @@ export type Label = {
   src: string; // who created the label (always the service act did)
   val: string; // the label itself
   subject: string; // the URI of the resource this label applies to
+  embed: string; // the embedded version of the post
   createdAt: string;
   indexedAt: string;
 };
@@ -77,6 +78,7 @@ migrations["001"] = {
       .addColumn("src", "varchar", (col) => col.notNull())
       .addColumn("val", "varchar", (col) => col.notNull())
       .addColumn("subject", "varchar", (col) => col.notNull())
+      .addColumn("embed", "varchar")
       .addColumn("createdAt", "varchar", (col) => col.notNull())
       .addColumn("indexedAt", "varchar", (col) => col.notNull())
       .execute();

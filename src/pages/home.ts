@@ -1,5 +1,5 @@
 import { labelCard } from "#/components/labelCard";
-import { html } from "../lib/view";
+import { Hole, html } from "../lib/view";
 import { shell } from "./shell";
 
 export type HomepageLabel = {
@@ -8,6 +8,7 @@ export type HomepageLabel = {
   subject: string;
   voted: boolean;
   score: number;
+  embed: Hole;
   createdAt: string;
   indexedAt: string;
 };
@@ -31,9 +32,9 @@ export function home(props: Props) {
 function content({ labels, profile }: Props) {
   return html`
     <div class="container">
-      <div class="card">${logout(profile)}</div>
-      <div class="card">${createLabelLink()}</div>
-      <div class="card">${feed(labels)}</div>
+      <div>${logout(profile)}</div>
+      <div>${createLabelLink()}</div>
+      <div>${feed(labels)}</div>
     </div>
   `;
 }

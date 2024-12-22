@@ -1,3 +1,4 @@
+import { embeddedPost } from "#/components/postEmbed";
 import { LabelRepository } from "#/db/labelRepository";
 import { VoteRepository } from "#/db/voteRepository";
 import { InvalidRecord, LabelExists } from "#/error";
@@ -39,10 +40,13 @@ export class GetLabel extends ContextualHandler {
 
       const score = await votes.getLabelScore(label.uri);
 
+      const embed = await embeddedPost(ctx.db, label.subject);
+
       const hydrated: HomepageLabel = {
         ...label,
         voted,
         score,
+        embed,
       };
       return res
         .type("html")
