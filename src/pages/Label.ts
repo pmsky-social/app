@@ -6,13 +6,18 @@ import { labelCard } from "#/components/labelCard";
 // view an individual label
 type Props = {
   label: HomepageLabel;
+  alreadyExisted: boolean;
 };
 
 export function Label(props: Props) {
+  let msg = "";
+  if (props.alreadyExisted) msg = "This label already exists";
   return shell({
+    path: ["label"],
     title: "View Label",
     header: "PMsky",
     subheader: "Viewing a label",
+    msg,
     content: content(props),
   });
 }

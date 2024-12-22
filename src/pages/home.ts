@@ -19,6 +19,7 @@ type Props = {
 
 export function home(props: Props) {
   return shell({
+    path: [],
     title: "Home",
     header: "PMsky",
     subheader: "Participate in the moderation of the atmosphere.",

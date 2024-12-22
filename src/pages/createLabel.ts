@@ -8,6 +8,7 @@ type Props = {
 
 export function createLabel(props: Props) {
   return shell({
+    path: ["createLabel"],
     title: "Create Label",
     header: "PMsky",
     subheader: html`Welcome to

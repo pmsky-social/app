@@ -26,6 +26,8 @@ export class GetLabel extends ContextualHandler {
     super(ctx, async (req, res) => {
       ctx.logger.trace(req.params, "got request to GET /label/:uri");
       ctx.logger.trace(req.query, "req.query");
+      const alreadyExisted = req.query.error === "exists";
+      ctx.logger.trace(alreadyExisted, "already exists?");
       const agent = await getSessionAgent(req, res, ctx);
       if (!agent || !agent.did) return res.sendStatus(403);
 
@@ -41,7 +43,9 @@ export class GetLabel extends ContextualHandler {
         ...label,
         voted,
       };
-      return res.type("html").send(page(Label({ label: hydrated })));
+      return res
+        .type("html")
+        .send(page(Label({ label: hydrated, alreadyExisted })));
     });
   }
 }
