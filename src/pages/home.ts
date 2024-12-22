@@ -1,11 +1,17 @@
-import type { Label } from "#/db";
 import { html } from "../lib/view";
 import { shell } from "./shell";
 
-const TODAY = new Date().toDateString();
+export type HomepageLabel = {
+  uri: string;
+  val: string;
+  subject: string;
+  voted: boolean;
+  createdAt: string;
+  indexedAt: string;
+};
 
 type Props = {
-  labels: Label[];
+  labels: HomepageLabel[];
   // didHandleMap: Record<string, string>;
   profile: { displayName?: string };
 };
@@ -37,7 +43,7 @@ function toBskyLink(did: string) {
   return `https://bsky.app/profile/${did}`;
 }
 
-function ts(label: Label) {
+function ts(label: HomepageLabel) {
   const createdAt = new Date(label.createdAt);
   const indexedAt = new Date(label.indexedAt);
   if (createdAt < indexedAt) return createdAt.toDateString();
@@ -55,7 +61,7 @@ function logout(profile: { displayName?: string }) {
   `;
 }
 
-function feed(labels: Label[]) {
+function feed(labels: HomepageLabel[]) {
   // returns a list of labels to vote on
   return html`
     <p>Here's a list of posts to vote on:</p>
@@ -65,29 +71,24 @@ function feed(labels: Label[]) {
   `;
 }
 
-function labelElement(label: Label) {
+function labelElement(label: HomepageLabel) {
   return html`
     <div class="card">
       <p>${label.val}</p>
       <p>${label.subject}</p>
       <p>${ts(label)}</p>
-      <p>${upvote(label)} ${downvote(label)}</p>
+      <p>${voting(label)}</p>
     </div>
   `;
 }
 
-function upvote(label: Label) {
+function voting(label: HomepageLabel) {
+  if (label.voted) return html`Thanks for voting!`;
   return html`
-    <form class="upvote" target="/vote?direction=up&uri=${label.uri}">
-      <button action="submit">upvote</button>
-    </form>
-  `;
-}
-
-function downvote(label: Label) {
-  return html`
-    <form class="downvote" target="/vote?direction=down&uri=${label.uri}">
-      <button action="submit">downvote</button>
+    <form method="post" class="upvote" action="/vote" rel="noopener">
+      <input name="uri" value="${label.uri}" type="hidden" />
+      <button name="direction" value="up">upvote</button>
+      <button name="direction" value="down">downvote</button>
     </form>
   `;
 }

@@ -49,7 +49,19 @@ export class PostLabel extends ContextualHandler {
 
       if (!subject.startsWith("at://")) {
         ctx.logger.trace(`transforming subject to at:// uri: ${subject}`);
-        subject = transformToAtUri(subject);
+        try {
+          subject = transformToAtUri(subject);
+        } catch (e) {
+          return res
+            .type("html")
+            .send(
+              page(
+                createLabel({
+                  error: "expected AT URI or link to a bsky post.",
+                })
+              )
+            );
+        }
         ctx.logger.trace(`transformed subject to at:// uri: ${subject}`);
       }
 

@@ -1,17 +1,25 @@
 import type { AppContext } from "..";
 import { ContextualHandler } from "./ContextualHandler";
+import { getSessionAgent } from "./util";
 
 export class PostVote extends ContextualHandler {
   constructor(ctx: AppContext) {
     super(ctx, async (req, res) => {
-      ctx.logger.info(req.params, "got request to POST /vote");
-      const { direction, labelUri } = req.params;
-      if (direction !== "up" && direction !== "down") {
-        res.status(400);
-      }
+      ctx.logger.info(req.body, "got request to POST /vote");
+      const agent = await getSessionAgent(req, res, ctx);
+      if (!agent || !agent.did) return res.sendStatus(403);
+
+      const { direction, uri } = req.body;
+      if (direction !== "up" && direction !== "down") res.status(400);
+
       const vote = direction === "up" ? 1 : -1;
-      const userDid = "did"; // todo: get user agent's did
-      await ctx.atSvcAct.publishVote(vote, labelUri, userDid);
+      try {
+        await ctx.atSvcAct.publishVote(vote, uri, agent.did);
+      } catch (err) {
+        ctx.logger.error({ err }, "publish vote failed");
+        return res.status(500).send(err);
+      }
+      res.redirect("/");
     });
   }
 }
