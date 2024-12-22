@@ -63,7 +63,7 @@ export class GetHomePage extends ContextualHandler {
     this.ctx.logger.trace(labelUris, "fetched labels for route /home");
     const alreadyVoted = await this.ctx.db
       .selectFrom("votes")
-      .selectAll()
+      .select("subject")
       .where("src", "=", agent.assertDid)
       .where("subject", "in", labelUris)
       .execute();
