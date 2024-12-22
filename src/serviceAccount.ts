@@ -10,11 +10,13 @@ import { v4 as uuid } from "uuid";
 import { env } from "#/lib/env";
 import { SvcActCredsStore } from "./auth/storage";
 import { SVC_ACT_SESSION_KEY } from "./constants";
-import type { Database } from "./db";
+import type { Database } from "./db/db";
 import {
   AlreadyVoted,
+  BadRequest,
   InvalidRecord,
   InvalidVote,
+  LabelExists,
   LabelNotFound,
 } from "./error";
 import { validateLabel } from "./lexicon/types/com/atproto/label/defs";
@@ -49,6 +51,7 @@ export class AtprotoServiceAccount {
     const agent = new AtpAgent({
       service: "https://bsky.social",
       persistSession: (evt: AtpSessionEvent, sess?: AtpSessionData) => {
+        logger.trace(evt, "svc act agent persist session");
         if (!sess) {
           logger.warn("tried to persist session, but session was undefined");
           return;
@@ -58,10 +61,14 @@ export class AtprotoServiceAccount {
       },
     });
 
-    await agent.login({
-      identifier: SVC_ACT_EMAIL,
-      password: SVC_ACT_APP_PW,
-    });
+    if (env.PUBLISH_TO_ATPROTO) {
+      await agent.login({
+        identifier: SVC_ACT_EMAIL,
+        password: SVC_ACT_APP_PW,
+      });
+    } else {
+      logger.warn("PUBLISH_TO_ATPROTO off, not logging in");
+    }
 
     return new AtprotoServiceAccount(agent, db, logger);
   }
@@ -73,6 +80,7 @@ export class AtprotoServiceAccount {
   did() {
     if (!this.agent.did) {
       this.logger.warn("No DID for service account when requested");
+      return env.SVC_ACT_DID;
     }
     assert(this.agent.did);
     return this.agent.did;
@@ -101,6 +109,10 @@ export class AtprotoServiceAccount {
   }
 
   async publishLabel(label: string, subject: string) {
+    const existing = await this.getLabelUri(label, subject);
+    if (existing !== undefined) {
+      throw new LabelExists(existing.uri);
+    }
     // Construct & validate label record
     const recordType = "com.atproto.label.defs#label";
     const rkey = TID.nextStr();
@@ -143,16 +155,41 @@ export class AtprotoServiceAccount {
         "failed to update computed view; ignoring as it should be caught by the firehose"
       );
     }
+
+    return uri;
   }
 
-  private async labelExists(labelUri: string) {
-    const row = await this.db
+  private async getLabelUri(label: string, subject: string) {
+    return await this.db
       .selectFrom("labels")
       .select("uri")
-      .where("uri", "=", labelUri)
+      .where("val", "=", label)
+      .where("subject", "=", subject)
       .executeTakeFirst();
+  }
 
-    return row !== undefined;
+  private async labelExists({
+    labelUri,
+    labelValue,
+    subject,
+  }: {
+    labelUri?: string;
+    labelValue?: string;
+    subject?: string;
+  }): Promise<boolean> {
+    let query = await this.db.selectFrom("labels").select("uri");
+
+    if (labelUri) {
+      query = query.where("uri", "=", labelUri);
+    } else if (labelValue && subject) {
+      query = query
+        .where("val", "=", labelValue)
+        .where("subject", "=", subject);
+    } else {
+      throw new BadRequest("missing labelUri or (labelValue and subject)");
+    }
+
+    return (await query.executeTakeFirst()) !== undefined;
   }
 
   private async userVotedAlready(
@@ -172,7 +209,8 @@ export class AtprotoServiceAccount {
   async publishVote(vote: 1 | -1, labelUri: string, userDid: string) {
     this.logger.trace({ vote, labelUri, userDid }, "svc act publish vote");
     // check that labelUri exists in DB, if not throw error
-    if (!(await this.labelExists(labelUri))) throw new LabelNotFound(labelUri);
+    if (!(await this.labelExists({ labelUri })))
+      throw new LabelNotFound(labelUri);
     if (await this.userVotedAlready(userDid, labelUri))
       throw new AlreadyVoted(labelUri);
     if (vote !== 1 && vote !== -1) throw new InvalidVote(vote);

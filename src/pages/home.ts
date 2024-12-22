@@ -1,3 +1,4 @@
+import { labelCard } from "#/components/labelCard";
 import { html } from "../lib/view";
 import { shell } from "./shell";
 
@@ -43,13 +44,6 @@ function toBskyLink(did: string) {
   return `https://bsky.app/profile/${did}`;
 }
 
-function ts(label: HomepageLabel) {
-  const createdAt = new Date(label.createdAt);
-  const indexedAt = new Date(label.indexedAt);
-  if (createdAt < indexedAt) return createdAt.toDateString();
-  return indexedAt.toDateString();
-}
-
 function logout(profile: { displayName?: string }) {
   return html`
     <form action="/logout" method="post" class="session-form">
@@ -66,29 +60,7 @@ function feed(labels: HomepageLabel[]) {
   return html`
     <p>Here's a list of posts to vote on:</p>
     ${labels.map((label) => {
-      return labelElement(label);
+      return labelCard(label);
     })}
-  `;
-}
-
-function labelElement(label: HomepageLabel) {
-  return html`
-    <div class="card">
-      <p>${label.val}</p>
-      <p>${label.subject}</p>
-      <p>${ts(label)}</p>
-      <p>${voting(label)}</p>
-    </div>
-  `;
-}
-
-function voting(label: HomepageLabel) {
-  if (label.voted) return html`Thanks for voting!`;
-  return html`
-    <form method="post" class="upvote" action="/vote" rel="noopener">
-      <input name="uri" value="${label.uri}" type="hidden" />
-      <button name="direction" value="up">upvote</button>
-      <button name="direction" value="down">downvote</button>
-    </form>
   `;
 }

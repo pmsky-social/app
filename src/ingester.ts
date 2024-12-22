@@ -6,7 +6,7 @@ import {
 } from "@skyware/jetstream";
 
 import pino from "pino";
-import type { Database } from "#/db";
+import type { Database } from "#/db/db";
 import {
   type Label,
   isLabel,
@@ -26,8 +26,9 @@ export function createIngester(db: Database, idResolver: IdResolver) {
   const jetstream = new Jetstream({
     wantedCollections: DESIRED_COLLECTIONS,
     wantedDids: [env.SVC_ACT_DID],
-    cursor: new Date("2024-12-17").getTime(),
+    cursor: new Date("2024-12-22").getTime(),
   });
+
   jetstream.onCreate(COM_ATPROTO_LABEL, async (evt) => {
     if (
       isLabel(evt.commit.record) &&
@@ -41,7 +42,7 @@ export function createIngester(db: Database, idResolver: IdResolver) {
   });
   jetstream.onDelete(COM_ATPROTO_LABEL, async (evt) => {
     await db
-      .deleteFrom("label")
+      .deleteFrom("labels")
       .where("uri", "=", evt.commit.rkey.toString())
       .execute();
   });
@@ -57,7 +58,7 @@ async function saveEvent(
   const record: Label = evt.commit.record as unknown as Label;
   const now = new Date();
   await db
-    .insertInto("label")
+    .insertInto("labels")
     .values({
       uri: evt.commit.rkey.toString(), // is this right?
       src: evt.did,

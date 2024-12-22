@@ -2,6 +2,7 @@ import { type Hole, html } from "../lib/view";
 import { shell } from "./shell";
 
 type Props = {
+  allowedLabelValues: string[];
   error?: string;
 };
 
@@ -15,18 +16,20 @@ export function createLabel(props: Props) {
   });
 }
 
-function content({ error }: Props): Hole {
+function content({ error, allowedLabelValues }: Props): Hole {
   return html`
     <div class="container">
       ${error && html`<div class="error visible">${error}</div>`}
       <div class="card">
         <form action="/label" method="post" class="create-label">
-          <input
+          <select
             type="text"
             name="label"
-            placeholder="Enter a label"
+            placeholder="Choose a label"
             required
-          />
+          >
+            ${allowedLabelValues.map(labelValueOption)}
+          </select>
           <input
             type="text"
             name="subject"
@@ -38,4 +41,8 @@ function content({ error }: Props): Hole {
       </div>
     </div>
   `;
+}
+
+function labelValueOption(labelValue: string) {
+  return html`<option value="${labelValue}">${labelValue}</option>`;
 }
