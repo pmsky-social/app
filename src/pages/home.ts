@@ -1,5 +1,5 @@
 import { labelCard } from "#/components/labelCard";
-import { embeddedPost, fetchAndCachePostEmbed } from "#/components/postEmbed";
+import { fetchAndCachePostEmbed } from "#/components/postEmbed";
 import { Database, Label } from "#/db/db";
 import { Hole, html } from "../lib/view";
 import { shell } from "./shell";

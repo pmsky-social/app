@@ -1,14 +1,12 @@
 import type { Agent } from "@atproto/api";
 import * as Profile from "#/lexicon/types/app/bsky/actor/profile";
-import { html, page } from "#/lib/view";
+import { page } from "#/lib/view";
 import { HomepageLabel, homepageLabelFromDB } from "#/pages/home";
 import { home } from "#/pages/home";
 import type { AppContext } from "..";
 import { ContextualHandler } from "./ContextualHandler";
 import { getSessionAgent } from "./util";
 import { VoteRepository } from "#/db/voteRepository";
-import { Label } from "#/db/db";
-import { fetchAndCachePostEmbed } from "#/components/postEmbed";
 
 export class GetHomePage extends ContextualHandler {
   constructor(ctx: AppContext) {
