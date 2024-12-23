@@ -1,12 +1,14 @@
 import type { Agent } from "@atproto/api";
 import * as Profile from "#/lexicon/types/app/bsky/actor/profile";
-import { page } from "#/lib/view";
-import type { HomepageLabel } from "#/pages/home";
+import { html, page } from "#/lib/view";
+import { HomepageLabel, homepageLabelFromDB } from "#/pages/home";
 import { home } from "#/pages/home";
 import type { AppContext } from "..";
 import { ContextualHandler } from "./ContextualHandler";
 import { getSessionAgent } from "./util";
 import { VoteRepository } from "#/db/voteRepository";
+import { Label } from "#/db/db";
+import { fetchAndCachePostEmbed } from "#/components/postEmbed";
 
 export class GetHomePage extends ContextualHandler {
   constructor(ctx: AppContext) {
@@ -53,7 +55,7 @@ export class GetHomePage extends ContextualHandler {
   }
 
   async getLabels(agent: Agent): Promise<HomepageLabel[]> {
-    const labels = await this.ctx.db
+    let labels = await this.ctx.db
       .selectFrom("labels")
       .selectAll()
       .orderBy("indexedAt", "desc")
@@ -69,28 +71,21 @@ export class GetHomePage extends ContextualHandler {
       .where("subject", "in", labelUris)
       .execute();
 
-    this.ctx.logger.trace(
-      alreadyVoted,
-      "fetched which votes already happened for route /home"
-    );
+    // this.ctx.logger.trace(
+    //   alreadyVoted,
+    //   "fetched which votes already happened for route /home"
+    // );
 
     const scores = await new VoteRepository(this.ctx.db).getLabelScores(
       labelUris
     );
 
-    this.ctx.logger.trace(scores, "fetched scores for labels");
-
-    return labels.map((l) => {
-      return {
-        uri: l.uri,
-        val: l.val,
-        author: l.author,
-        subject: l.subject,
-        voted: alreadyVoted.some((v) => v.subject === l.uri),
-        score: scores[l.uri] || 0,
-        createdAt: l.createdAt,
-        indexedAt: l.indexedAt,
-      };
-    });
+    // this.ctx.logger.trace(scores, "fetched scores for labels");
+    return await Promise.all(
+      labels.map(
+        async (l) =>
+          await homepageLabelFromDB(l, alreadyVoted, scores, this.ctx.db)
+      )
+    );
   }
 }

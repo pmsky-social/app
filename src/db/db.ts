@@ -22,7 +22,7 @@ export type Label = {
   src: string; // who created the label (always the service act did)
   val: string; // the label itself
   subject: string; // the URI of the resource this label applies to
-  embed: string; // the embedded version of the post
+  embed: string | undefined; // the embedded version of the post
   createdAt: string;
   indexedAt: string;
 };

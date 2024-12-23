@@ -26,17 +26,24 @@ async function getCachedPostEmbed(db: Database, uri: string) {
     .where("uri", "=", uri)
     .executeTakeFirst();
 
-  if (cached) return html`${html([cached.embed])}`;
+  // @ts-ignore
+  if (cached) return html([cached.embed]);
 
+  return await fetchAndCachePostEmbed(db, uri);
+}
+
+export async function fetchAndCachePostEmbed(db: Database, uri: string) {
   try {
     const embed = await getPostEmbed(uri);
     console.log("caching embed");
     await db
       .updateTable("labels")
-      .where("uri", "=", uri)
+      .where("subject", "=", uri)
       .set("embed", embed)
       .execute();
-    return html`${html([embed])}`;
+
+    // @ts-ignore
+    return html([embed]);
   } catch (e) {
     console.error(e);
     return html`<p>Failed to load post embed</p>`;

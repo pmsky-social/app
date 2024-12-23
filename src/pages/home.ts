@@ -1,4 +1,6 @@
 import { labelCard } from "#/components/labelCard";
+import { embeddedPost, fetchAndCachePostEmbed } from "#/components/postEmbed";
+import { Database, Label } from "#/db/db";
 import { Hole, html } from "../lib/view";
 import { shell } from "./shell";
 
@@ -12,6 +14,27 @@ export type HomepageLabel = {
   createdAt: string;
   indexedAt: string;
 };
+
+export async function homepageLabelFromDB(
+  l: Label,
+  alreadyVoted: { subject: string }[],
+  scores: { [uri: string]: number },
+  db: Database
+): Promise<HomepageLabel> {
+  return {
+    uri: l.uri,
+    val: l.val,
+    subject: l.subject,
+    voted: alreadyVoted.some((v) => v.subject === l.uri),
+    embed: l.embed
+      ? // @ts-ignore
+        html([l.embed])
+      : await fetchAndCachePostEmbed(db, l.subject),
+    score: scores[l.uri] || 0,
+    createdAt: l.createdAt,
+    indexedAt: l.indexedAt,
+  };
+}
 
 type Props = {
   labels: HomepageLabel[];
