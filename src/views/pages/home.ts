@@ -1,7 +1,7 @@
 import { labelCard } from "#/views/components/labelCard";
 import { fetchAndCachePostEmbed } from "#/views/components/postEmbed";
 import { Database, Label } from "#/db/db";
-import { Hole, html } from "../lib/view";
+import { Hole, html } from "#/lib/view";
 import { shell } from "./shell";
 
 export type HomepageLabel = {

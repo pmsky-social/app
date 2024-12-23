@@ -1,4 +1,4 @@
-import { type Hole, html } from "../lib/view";
+import { type Hole, html } from "#/lib/view";
 import { shell } from "./shell";
 
 type Props = {
