@@ -90,7 +90,8 @@ function feed(labels: HomepageLabel[]) {
   return html`
     <p>Here's a list of posts to vote on:</p>
     ${labels.map((label) => {
-      return labelCard(label);
+      const href = `/label/${label.uri}`;
+      return html`<a href="${href}">${labelCard(label)}</a>`;
     })}
   `;
 }

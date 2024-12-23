@@ -23,9 +23,5 @@ export function Label(props: Props) {
 }
 
 function content({ label }: Props) {
-  return html`
-    <div class="container">
-      <div class="card">${labelCard(label)}</div>
-    </div>
-  `;
+  return html` <div class="container">${labelCard(label)}</div> `;
 }
