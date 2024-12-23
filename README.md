@@ -30,7 +30,7 @@ This means that you cannot change your vote once you've cast it.
     - [x] routes
 - [ ] better label UI (show actual post, context?)
     - [x] show label score
-    - [ ] show number of votes too?
+    - [x] show number of votes too?
     - [ ] render post when creating a label
 - [ ] separate posts table to store embeds (to avoid storing dups)
 - [ ] refactor as more MVC

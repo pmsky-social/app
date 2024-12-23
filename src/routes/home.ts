@@ -1,8 +1,8 @@
 import type { Agent } from "@atproto/api";
 import * as Profile from "#/lexicon/types/app/bsky/actor/profile";
 import { page } from "#/lib/view";
-import { HomepageLabel, homepageLabelFromDB } from "#/pages/home";
-import { home } from "#/pages/home";
+import { HomepageLabel, homepageLabelFromDB } from "#/views/pages/home";
+import { home } from "#/views/pages/home";
 import type { AppContext } from "..";
 import { ContextualHandler } from "./ContextualHandler";
 import { getSessionAgent } from "./util";

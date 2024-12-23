@@ -27,6 +27,10 @@ export type Label = {
   indexedAt: string;
 };
 
+export type Post = {
+  uri: string;
+};
+
 // this struct only tracks the labels and voters, no vote values or record URIs
 export type UserVote = {
   // uri: string; // URI of the vote

@@ -1,7 +1,7 @@
 import { OAuthResolverError } from "@atproto/oauth-client-node";
 import { isValidHandle } from "@atproto/syntax";
 import { page } from "#/lib/view";
-import { login } from "#/pages/login";
+import { login } from "#/views/pages/login";
 import type { AppContext } from "..";
 import { ContextualHandler } from "./ContextualHandler";
 import { getSession } from "./util";

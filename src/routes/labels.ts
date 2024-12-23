@@ -1,11 +1,11 @@
-import { embeddedPost } from "#/components/postEmbed";
+import { embeddedPost } from "#/views/components/postEmbed";
 import { LabelRepository } from "#/db/labelRepository";
 import { VoteRepository } from "#/db/voteRepository";
 import { InvalidRecord, LabelExists } from "#/error";
 import { page } from "#/lib/view";
-import { Label } from "#/pages/Label";
-import { createLabel } from "#/pages/createLabel";
-import { HomepageLabel } from "#/pages/home";
+import { Label } from "#/views/pages/Label";
+import { createLabel } from "#/views/pages/createLabel";
+import { HomepageLabel } from "#/views/pages/home";
 import type { AppContext } from "..";
 import { ContextualHandler } from "./ContextualHandler";
 import { getSessionAgent } from "./util";

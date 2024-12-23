@@ -1,7 +1,7 @@
 import { html } from "#/lib/view";
 import type { HomepageLabel } from "./home";
 import { shell } from "./shell";
-import { labelCard } from "#/components/labelCard";
+import { labelCard } from "#/views/components/labelCard";
 
 // view an individual label
 type Props = {
