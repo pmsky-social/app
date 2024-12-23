@@ -31,6 +31,10 @@ This means that you cannot change your vote once you've cast it.
 - [ ] better label UI (show actual post, context?)
     - [x] show label score
     - [ ] show number of votes too?
+    - [ ] render post when creating a label
+- [ ] separate posts table to store embeds (to avoid storing dups)
+- [ ] refactor as more MVC
+- [ ] some testing framework? cypress? screenshots?
 - [x] records are published to at proto in the service acct's PDS 
 - [x] watch the firehose for labels published to pmsky pds
 - [~] create a generic "server message" thing to handle responses.  maybe end up using more ajax calls than plain html
