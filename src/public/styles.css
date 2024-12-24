@@ -85,6 +85,10 @@ button:hover,
   background: var(--primary-400);
 }
 
+button.secondary {
+  background-color: var(--gray-500);
+}
+
 /*
   Custom components
 */
@@ -257,16 +261,21 @@ form.createLabel {
   flex-direction: column;
 }
 
-form.createLabel>select,
-form.createLabel>input {
+form.createLabel select,
+form.createLabel input {
   margin-bottom: 1em;
 }
 
-form.createLabel>input {
+form.createLabel input,
+form.createLabel div {
   width: 100%;
   text-align: center;
 }
 
-form.createLabel>select {
+form.createLabel select {
   min-width: 50%;
+}
+
+form.createLabel #cancel-button {
+  margin-bottom: 1em;
 }

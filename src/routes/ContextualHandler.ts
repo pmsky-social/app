@@ -14,6 +14,10 @@ export class ContextualHandler {
     res: express.Response,
     next: express.NextFunction
   ) {
+    this.ctx.logger.trace(
+      { body: req.body, params: req.params, query: req.query },
+      `got request to ${req.method} ${req.url}`
+    );
     return this.fn(req, res, next);
   }
 }

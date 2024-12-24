@@ -7,6 +7,7 @@ import { GetLabel, GetLabelsCreate, PostLabel } from "./labels";
 import { GetLogin, PostLogin, PostLogout } from "./login";
 import { GetClientMetadata, GetOauthCallback } from "./oauth";
 import { PostVote } from "./vote";
+import { PostEmbeddedPost } from "./embeddedPosts";
 
 // Helper function for defining routes
 const handler =
@@ -34,6 +35,7 @@ export const createRouter = (ctx: AppContext) => {
 
   router.get("/client-metadata.json", handler(new GetClientMetadata(ctx)));
   router.get("/oauth/callback", handler(new GetOauthCallback(ctx)));
+  router.post("/api/embedPost", handler(new PostEmbeddedPost(ctx)));
   router.get("/login", handler(new GetLogin(ctx)));
   router.post("/login", handler(new PostLogin(ctx)));
   router.post("/logout", handler(new PostLogout(ctx)));

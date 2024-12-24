@@ -28,12 +28,27 @@ function content({ error, allowedLabelValues }: Props): Hole {
           method="post"
           class="create-label"
         >
-          <input
-            type="text"
-            name="subject"
-            placeholder="Paste a link from Bsky..."
-            required
-          />
+          <div id="input-container">
+            <input
+              type="text"
+              id="subject-input"
+              name="subject"
+              placeholder="Paste a link from Bsky..."
+              hx-post="/api/embedPost"
+              hx-trigger="input changed delay:200ms"
+              hx-target="#oembed-preview"
+              required
+            />
+          </div>
+
+          <div id="preview-container" style="display: none;">
+            <div id="oembed-preview"></div>
+            <button type="button" class="secondary" id="cancel-button">
+              Remove post
+            </button>
+          </div>
+
+          <input type="hidden" name="oembedHtml" id="oembedHtml" />
           <select
             type="text"
             name="label"
@@ -46,6 +61,44 @@ function content({ error, allowedLabelValues }: Props): Hole {
         </form>
       </div>
     </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const cancelButton = document.getElementById("cancel-button");
+        const inputContainer = document.getElementById("input-container");
+        const previewContainer = document.getElementById("preview-container");
+        const oembedPreview = document.getElementById("oembed-preview");
+        const oembedHtmlInput = document.getElementById("oembedHtml");
+
+        cancelButton.addEventListener("click", () => {
+          inputContainer.style.display = "block";
+          previewContainer.style.display = "none";
+          oembedPreview.innerHTML = "";
+          oembedHtmlInput.value = "";
+          inputContainer.value = "";
+        });
+
+        // Automatically show preview container when HTML is loaded
+        oembedPreview.addEventListener("htmx:afterSwap", () => {
+          if (event.target.id === "oembed-preview") {
+            // Show the preview container
+            inputContainer.style.display = "none";
+            previewContainer.style.display = "block";
+
+            // Update the hidden input with the fetched HTML
+            oembedHtmlInput.value = oembedPreview.innerHTML;
+
+            // Find and execute <script> tags in the response
+            const scripts = oembedPreview.querySelectorAll("script");
+            scripts.forEach((script) => {
+              const newScript = document.createElement("script");
+              newScript.textContent = script.textContent;
+              oembedPreview.appendChild(newScript);
+              oembedPreview.removeChild(newScript); // Clean up after execution
+            });
+          }
+        });
+      });
+    </script>
   `;
 }
 

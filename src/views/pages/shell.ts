@@ -25,6 +25,7 @@ export function shell({
     <head>
       <title>${title}</title>
       <link rel="stylesheet" href="/public/styles.css" />
+      <script src="https://unpkg.com/htmx.org@2.0.4"></script>
     </head>
     <body>
       <div class="${errorClass}">${msg}</div>
