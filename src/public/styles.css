@@ -124,6 +124,7 @@ button:hover,
   border-radius: 6px;
   padding: 10px 16px;
   background-color: #fff;
+  width: 100%;
 }
 
 .card> :first-child {
@@ -250,4 +251,22 @@ h1>a {
 .voting-thankyou {
   color: #28a745;
   font-weight: bold;
+}
+
+form.createLabel {
+  flex-direction: column;
+}
+
+form.createLabel>select,
+form.createLabel>input {
+  margin-bottom: 1em;
+}
+
+form.createLabel>input {
+  width: 100%;
+  text-align: center;
+}
+
+form.createLabel>select {
+  min-width: 50%;
 }

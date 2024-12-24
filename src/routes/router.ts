@@ -29,7 +29,7 @@ export const createRouter = (ctx: AppContext) => {
   // Static assets
   router.use(
     "/public",
-    express.static(path.join(__dirname, "..", "pages", "public")) // TODO: fix path to not need ".."
+    express.static(path.join(__dirname, "..", "public")) // TODO: fix path to not need ".."
   );
 
   router.get("/client-metadata.json", handler(new GetClientMetadata(ctx)));

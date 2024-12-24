@@ -22,7 +22,18 @@ function content({ error, allowedLabelValues }: Props): Hole {
     <div class="container">
       ${error && html`<div class="error visible">${error}</div>`}
       <div class="card">
-        <form action="/label" method="post" class="create-label">
+        <form
+          class="createLabel"
+          action="/label"
+          method="post"
+          class="create-label"
+        >
+          <input
+            type="text"
+            name="subject"
+            placeholder="Paste a link from Bsky..."
+            required
+          />
           <select
             type="text"
             name="label"
@@ -31,12 +42,6 @@ function content({ error, allowedLabelValues }: Props): Hole {
           >
             ${allowedLabelValues.map(labelValueOption)}
           </select>
-          <input
-            type="text"
-            name="subject"
-            placeholder="at://did:plc:44ybard42vv44zksie28o7ez/app.bsky.feed.post/3jwdxj2crlk16"
-            required
-          />
           <button type="submit">Create</button>
         </form>
       </div>
