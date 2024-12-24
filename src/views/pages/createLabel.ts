@@ -65,6 +65,7 @@ function content({ error, allowedLabelValues }: Props): Hole {
       document.addEventListener("DOMContentLoaded", () => {
         const cancelButton = document.getElementById("cancel-button");
         const inputContainer = document.getElementById("input-container");
+        const urlInput = document.getElementById("subject-input");
         const previewContainer = document.getElementById("preview-container");
         const oembedPreview = document.getElementById("oembed-preview");
         const oembedHtmlInput = document.getElementById("oembedHtml");
@@ -74,7 +75,7 @@ function content({ error, allowedLabelValues }: Props): Hole {
           previewContainer.style.display = "none";
           oembedPreview.innerHTML = "";
           oembedHtmlInput.value = "";
-          inputContainer.value = "";
+          urlInput.value = "";
         });
 
         // Automatically show preview container when HTML is loaded

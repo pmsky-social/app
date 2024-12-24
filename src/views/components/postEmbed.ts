@@ -23,7 +23,7 @@ async function getCachedPostEmbed(db: Database, uri: string) {
   const cached = await db
     .selectFrom("labels")
     .select("embed")
-    .where("uri", "=", uri)
+    .where("subject", "=", uri)
     .executeTakeFirst();
 
   // @ts-ignore
@@ -51,7 +51,7 @@ export async function fetchAndCachePostEmbed(db: Database, uri: string) {
 }
 
 async function getPostEmbed(uri: string) {
-  const url = bskyUrl(uri);
+  const url = uri.startsWith("at://") ? bskyUrl(uri) : uri;
   console.log("fetching embed for url: ", url);
   const response = await fetch(
     `https://embed.bsky.app/oembed?url=${encodeURIComponent(url)}`
