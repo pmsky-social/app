@@ -9,7 +9,7 @@ import type { Logger } from "pino";
 import { v4 as uuid } from "uuid";
 import { env } from "#/lib/env";
 import { SvcActCredsStore } from "./auth/storage";
-import { SVC_ACT_SESSION_KEY } from "./constants";
+import { SOCIAL_PMSKY_LABEL, SVC_ACT_SESSION_KEY } from "./constants";
 import type { Database } from "./db/db";
 import {
   AlreadyVoted,
@@ -59,10 +59,18 @@ export class AtprotoServiceAccount {
     });
 
     if (env.PUBLISH_TO_ATPROTO) {
-      await agent.login({
-        identifier: SVC_ACT_EMAIL,
-        password: SVC_ACT_APP_PW,
-      });
+      const store = new SvcActCredsStore(db);
+      const session_data = await store.get(SVC_ACT_SESSION_KEY);
+      if (session_data) {
+        logger.trace("resuming session");
+        await agent.resumeSession(session_data);
+      } else {
+        logger.trace("creating session by logging in");
+        await agent.login({
+          identifier: SVC_ACT_EMAIL,
+          password: SVC_ACT_APP_PW,
+        });
+      }
     } else {
       logger.warn("PUBLISH_TO_ATPROTO off, not logging in");
     }
@@ -97,7 +105,9 @@ export class AtprotoServiceAccount {
       validate: false,
     };
     if (env.PUBLISH_TO_ATPROTO) {
+      this.logger.trace(req, "publishing record to atproto");
       const res = await this.agent.com.atproto.repo.putRecord(req);
+      this.logger.trace(res, "got response");
       uri = res.data.uri;
     } else {
       this.logger.warn(
@@ -115,10 +125,9 @@ export class AtprotoServiceAccount {
       throw new LabelExists(existing.uri);
     }
     // Construct & validate label record
-    const recordType = "com.atproto.label.defs#label";
     const rkey = TID.nextStr();
     const record: LabelRecord = {
-      $type: recordType,
+      $type: SOCIAL_PMSKY_LABEL,
       src: this.did(),
       uri: subject,
       val: label,
@@ -128,11 +137,11 @@ export class AtprotoServiceAccount {
     const validationResult = validateLabel(record);
     if (!validationResult.success) {
       this.logger.error(validationResult, "invalid label record: ");
-      throw new InvalidRecord(recordType);
+      throw new InvalidRecord(SOCIAL_PMSKY_LABEL);
     }
 
     // todo: make sure if this fails, it's handled correctly
-    const uri = await this.putRecord(record, recordType, rkey);
+    const uri = await this.putRecord(record, SOCIAL_PMSKY_LABEL, rkey);
 
     try {
       // Optimistically update our SQLite
@@ -142,6 +151,7 @@ export class AtprotoServiceAccount {
       await this.db
         .insertInto("labels")
         .values({
+          rkey,
           uri,
           src: record.src,
           val: record.val,
@@ -150,6 +160,7 @@ export class AtprotoServiceAccount {
           indexedAt: new Date().toISOString(),
         })
         .execute();
+      this.logger.trace("saved new label to local db");
     } catch (err) {
       this.logger.warn(
         { err },
@@ -229,7 +240,7 @@ export class AtprotoServiceAccount {
     const voteRecordUri = await this.putRecord(record, recordType, rkey);
 
     try {
-      await new VoteRepository(this.db).saveVote(
+      await new VoteRepository(this.db, this.logger).saveVote(
         userDid,
         labelUri,
         vote,

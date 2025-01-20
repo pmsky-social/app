@@ -30,12 +30,12 @@ export class GetLabel extends ContextualHandler {
       const alreadyExisted = req.query.error === "exists";
       ctx.logger.trace(alreadyExisted, "already exists?");
       const agent = await getSessionAgent(req, res, ctx);
-      if (!agent || !agent.did) return res.sendStatus(403);
+      if (!agent || !agent.did) return res.sendStatus(403); // TODO: redirect, or use auth middleware
 
       const label = await new LabelRepository(ctx.db).getLabel(req.params.uri);
       if (!label) return res.sendStatus(404);
 
-      const votes = new VoteRepository(ctx.db);
+      const votes = new VoteRepository(ctx.db, ctx.logger);
       const voted = await votes.userVotedAlready(agent.did, label.uri);
 
       const score = await votes.getLabelScore(label.uri);
@@ -108,8 +108,8 @@ export class PostLabel extends ContextualHandler {
       }
 
       try {
-        const uri = await ctx.atSvcAct.publishLabel(label, subject);
-        return res.redirect(`/label/${uri}`);
+        const rkey = await ctx.atSvcAct.publishLabel(label, subject);
+        return res.redirect(`/label/${rkey}`);
       } catch (e) {
         ctx.logger.error(e, "error publishing label");
         if (e instanceof InvalidRecord) {

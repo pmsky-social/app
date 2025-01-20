@@ -18,6 +18,7 @@ export type DatabaseSchema = {
 };
 
 export type Label = {
+  rkey: string; // primary key
   uri: string; // record ID (produced by ATProto)
   src: string; // who created the label (always the service act did)
   val: string; // the label itself
@@ -78,7 +79,8 @@ migrations["001"] = {
   async up(db: Kysely<unknown>) {
     await db.schema
       .createTable("labels")
-      .addColumn("uri", "varchar", (col) => col.primaryKey())
+      .addColumn("rkey", "varchar", (col) => col.primaryKey())
+      .addColumn("uri", "varchar", (col) => col.notNull())
       .addColumn("src", "varchar", (col) => col.notNull())
       .addColumn("val", "varchar", (col) => col.notNull())
       .addColumn("subject", "varchar", (col) => col.notNull())

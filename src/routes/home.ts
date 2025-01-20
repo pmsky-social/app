@@ -74,9 +74,10 @@ export class GetHomePage extends ContextualHandler {
     //   "fetched which votes already happened for route /home"
     // );
 
-    const scores = await new VoteRepository(this.ctx.db).getLabelScores(
-      labelUris
-    );
+    const scores = await new VoteRepository(
+      this.ctx.db,
+      this.ctx.logger
+    ).getLabelScores(labelUris);
 
     // this.ctx.logger.trace(scores, "fetched scores for labels");
     return await Promise.all(

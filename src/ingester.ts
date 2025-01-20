@@ -18,20 +18,17 @@ import {
   Record as Vote,
 } from "#/lexicon/types/social/pmsky/vote";
 import { env } from "./lib/env";
+import { SOCIAL_PMSKY_LABEL, SOCIAL_PMSKY_VOTE } from "./constants";
 
-const COM_ATPROTO_LABEL = "com.atproto.label.defs#label";
-const SOCIAL_PMSKY_LABEL = "social.pmsky.label";
-const SOCIAL_PMSKY_VOTE = "social.pmsky.vote";
 const ALL_SOCIAL_PMSKY_RECORDS = "social.pmsky.*";
 const DESIRED_COLLECTIONS = [
-  // COM_ATPROTO_LABEL,
   // SOCIAL_PMSKY_LABEL,
   // SOCIAL_PMSKY_VOTE,
   ALL_SOCIAL_PMSKY_RECORDS,
 ];
 
 export function createIngester(db: Database, idResolver: IdResolver) {
-  const logger = pino({ name: "firehose ingestion" });
+  const logger = pino({ name: "firehose", level: env.LOG_LEVEL });
   if (!env.PUBLISH_TO_ATPROTO) {
     logger.warn("PUBLISH_TO_ATPROTO off, not running ingester");
     return;
@@ -39,23 +36,35 @@ export function createIngester(db: Database, idResolver: IdResolver) {
   const jetstream = new Jetstream({
     wantedCollections: DESIRED_COLLECTIONS,
     wantedDids: [env.SVC_ACT_DID],
-    cursor: new Date("2025-01-19").getTime(),
+    cursor: 1737429693000000,
+    // 3rd label created at:
+    // cursor: 1737410063753314
+    // 4th
+    // cursor: 1737411385065087
   });
 
   jetstream.on("open", () => {
     logger.info("jetstream opened");
   });
 
+  jetstream.on("close", () => {
+    logger.info("jetstream closed");
+  });
+
   jetstream.on("error", (err) => {
     logger.error(err, "jetstream error");
   });
 
+  jetstream.on("commit", (evt) => {
+    logger.trace(evt, "received commit");
+  });
+
   jetstream.onCreate(SOCIAL_PMSKY_LABEL, async (evt) => {
+    logger.trace(evt, "creating label");
     if (
       isLabel(evt.commit.record) &&
       validateLabel(evt.commit.record).success
     ) {
-      logger.trace(evt, "creating label");
       saveLabel(db, evt);
     } else {
       logger.warn(evt, "invalid label record");
@@ -114,7 +123,8 @@ async function saveLabel(
   await db
     .insertInto("labels")
     .values({
-      uri: evt.commit.rkey.toString(), // is this right?
+      rkey: evt.commit.rkey.toString(),
+      uri: `at://${evt.did}/social.pmsky.label/${evt.commit.rkey}`,
       src: evt.did,
       val: record.val,
       subject: record.uri,
@@ -122,7 +132,7 @@ async function saveLabel(
       indexedAt: now.toISOString(),
     })
     .onConflict((oc) =>
-      oc.column("uri").doUpdateSet({
+      oc.column("rkey").doUpdateSet({
         val: record.val,
         subject: record.uri,
         indexedAt: now.toISOString(),

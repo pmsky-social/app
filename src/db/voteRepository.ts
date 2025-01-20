@@ -1,8 +1,12 @@
 import { allComplete } from "@atproto/common";
 import type { Database } from "./db";
+import { Logger } from "pino";
 
 export class VoteRepository {
-  constructor(private db: Database) {}
+  constructor(
+    private db: Database,
+    private logger: Logger
+  ) {}
 
   async userVotedAlready(userDid: string, labelUri: string): Promise<boolean> {
     return (
@@ -16,7 +20,7 @@ export class VoteRepository {
   }
 
   async getLabelScore(uri: string): Promise<number> {
-    console.trace(`getting score for label: ${uri}`);
+    this.logger.trace(uri, `getting score for label: ${uri}`);
     const votes = await this.db
       .selectFrom("label_votes")
       .select("val")
