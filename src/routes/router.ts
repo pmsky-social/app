@@ -40,7 +40,7 @@ export const createRouter = (ctx: AppContext) => {
   router.post("/login", handler(new PostLogin(ctx)));
   router.post("/logout", handler(new PostLogout(ctx)));
   router.get("/labels/create", handler(new GetLabelsCreate(ctx)));
-  router.get("/label/:uri", handler(new GetLabel(ctx)));
+  router.get("/label/:rkey", handler(new GetLabel(ctx)));
   router.post("/label", handler(new PostLabel(ctx)));
   router.post("/vote", handler(new PostVote(ctx)));
   router.get("/", handler(new GetHomePage(ctx)));

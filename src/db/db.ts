@@ -19,7 +19,6 @@ export type DatabaseSchema = {
 
 export type Label = {
   rkey: string; // primary key
-  uri: string; // record ID (produced by ATProto)
   src: string; // who created the label (always the service act did)
   val: string; // the label itself
   subject: string; // the URI of the resource this label applies to
@@ -80,7 +79,6 @@ migrations["001"] = {
     await db.schema
       .createTable("labels")
       .addColumn("rkey", "varchar", (col) => col.primaryKey())
-      .addColumn("uri", "varchar", (col) => col.notNull())
       .addColumn("src", "varchar", (col) => col.notNull())
       .addColumn("val", "varchar", (col) => col.notNull())
       .addColumn("subject", "varchar", (col) => col.notNull())

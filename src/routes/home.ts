@@ -60,7 +60,10 @@ export class GetHomePage extends ContextualHandler {
       .limit(10)
       .execute();
 
-    const labelUris = labels.map((s) => s.uri);
+    const labelUris = labels.map(
+      (l) => `at://${l.src}/social.pmsky.label/${l.rkey}`
+    );
+
     this.ctx.logger.trace(labelUris, "fetched labels for route /home");
     const alreadyVoted = await this.ctx.db
       .selectFrom("user_votes")

@@ -32,18 +32,19 @@ export class GetLabel extends ContextualHandler {
       const agent = await getSessionAgent(req, res, ctx);
       if (!agent || !agent.did) return res.sendStatus(403); // TODO: redirect, or use auth middleware
 
-      const label = await new LabelRepository(ctx.db).getLabel(req.params.uri);
+      const label = await new LabelRepository(ctx.db).getLabel(req.params.rkey);
       if (!label) return res.sendStatus(404);
 
       const votes = new VoteRepository(ctx.db, ctx.logger);
-      const voted = await votes.userVotedAlready(agent.did, label.uri);
-
-      const score = await votes.getLabelScore(label.uri);
+      const labelUri = `at://${label.src}/social.pmsky.label/${label.rkey}`;
+      const voted = await votes.userVotedAlready(agent.did, labelUri);
+      const score = await votes.getLabelScore(labelUri);
 
       const embed = await embeddedPost(ctx.db, label.subject);
 
       const hydrated: HomepageLabel = {
         ...label,
+        uri: labelUri,
         voted,
         score,
         embed,

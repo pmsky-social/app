@@ -80,7 +80,7 @@ export function createIngester(db: Database, idResolver: IdResolver) {
     logger.trace(evt, "deleting label");
     await db
       .deleteFrom("labels")
-      .where("uri", "=", evt.commit.rkey.toString())
+      .where("rkey", "=", evt.commit.rkey.toString())
       .execute();
   });
 
@@ -124,7 +124,6 @@ async function saveLabel(
     .insertInto("labels")
     .values({
       rkey: evt.commit.rkey.toString(),
-      uri: `at://${evt.did}/social.pmsky.label/${evt.commit.rkey}`,
       src: evt.did,
       val: record.val,
       subject: record.uri,

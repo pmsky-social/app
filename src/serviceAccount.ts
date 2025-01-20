@@ -122,7 +122,7 @@ export class AtprotoServiceAccount {
   async publishLabel(label: string, subject: string) {
     const existing = await this.getLabelUri(label, subject);
     if (existing !== undefined) {
-      throw new LabelExists(existing.uri);
+      throw new LabelExists(existing);
     }
     // Construct & validate label record
     const rkey = TID.nextStr();
@@ -152,7 +152,6 @@ export class AtprotoServiceAccount {
         .insertInto("labels")
         .values({
           rkey,
-          uri,
           src: record.src,
           val: record.val,
           subject,
@@ -168,16 +167,24 @@ export class AtprotoServiceAccount {
       );
     }
 
-    return uri;
+    return rkey;
   }
 
   private async getLabelUri(label: string, subject: string) {
-    return await this.db
+    const row = await this.db
       .selectFrom("labels")
-      .select("uri")
+      .select("rkey")
+      .select("src")
       .where("val", "=", label)
       .where("subject", "=", subject)
       .executeTakeFirst();
+    if (!row) {
+      this.logger.trace({ label, subject }, "no label found");
+      return undefined;
+    }
+    const { rkey, src } = row;
+    const uri = `at://${src}/social.pmsky.label/${rkey}`;
+    return uri;
   }
 
   private async labelExists({
@@ -189,10 +196,12 @@ export class AtprotoServiceAccount {
     labelValue?: string;
     subject?: string;
   }): Promise<boolean> {
-    let query = this.db.selectFrom("labels").select("uri");
+    let query = this.db.selectFrom("labels").select("rkey");
 
     if (labelUri) {
-      query = query.where("uri", "=", labelUri);
+      const rkey = labelUri.split("/")[-1];
+      const src = labelUri.split("/")[2];
+      query = query.where("rkey", "=", rkey).where("src", "=", src);
     } else if (labelValue && subject) {
       query = query
         .where("val", "=", labelValue)

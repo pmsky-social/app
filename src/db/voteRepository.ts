@@ -1,4 +1,3 @@
-import { allComplete } from "@atproto/common";
 import type { Database } from "./db";
 import { Logger } from "pino";
 
@@ -27,7 +26,7 @@ export class VoteRepository {
       .where("subject", "=", uri)
       .execute();
     const score = votes.reduce((acc, vote) => acc + vote.val, 0);
-    console.trace(`score: ${score}`);
+    this.logger.trace(`score: ${score}`);
     return score;
   }
 
