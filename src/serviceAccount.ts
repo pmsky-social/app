@@ -19,8 +19,13 @@ import {
   LabelExists,
   LabelNotFound,
 } from "./error";
-import { validateLabel } from "./lexicon/types/com/atproto/label/defs";
+import {
+  validateLabel,
+  Label as LabelRecord,
+  Label,
+} from "./lexicon/types/com/atproto/label/defs";
 import { VoteRepository } from "./db/voteRepository";
+import { Record as VoteRecord } from "./lexicon/types/social/pmsky/vote";
 
 ///
 /// this agent is used to perform actions on behalf of the platform,
@@ -30,14 +35,6 @@ import { VoteRepository } from "./db/voteRepository";
 /// https://github.com/bluesky-social/atproto/discussions/2656#discussioncomment-11600163
 
 /// TODO: figure out how to persist the session? refresh tokens?
-
-type Record = {
-  $type: string;
-  src: string;
-  uri: string;
-  val: string | number; // TODO: need different record types? maybe LabelRecord and VoteRecord?
-  cts: string;
-};
 
 export class AtprotoServiceAccount {
   constructor(
@@ -87,7 +84,11 @@ export class AtprotoServiceAccount {
     return this.agent.did;
   }
 
-  private async putRecord(record: Record, collection: string, rkey: string) {
+  private async putRecord(
+    record: LabelRecord | VoteRecord,
+    collection: string,
+    rkey: string
+  ) {
     let uri: string;
     const req = {
       repo: this.did(),
@@ -117,10 +118,10 @@ export class AtprotoServiceAccount {
     // Construct & validate label record
     const recordType = "com.atproto.label.defs#label";
     const rkey = TID.nextStr();
-    const record = {
+    const record: Label = {
       $type: recordType,
       src: this.did(),
-      uri: subject, // todo: is this right? maybe should publish subject as subject
+      uri: subject,
       val: label,
       cts: new Date().toISOString(),
     };
@@ -218,10 +219,10 @@ export class AtprotoServiceAccount {
 
     const recordType = "social.pmsky.label.vote";
     const rkey = TID.nextStr();
-    const record = {
+    const record: VoteRecord = {
       $type: recordType,
       src: this.did(),
-      uri: labelUri, // TODO: see publishLabel
+      uri: labelUri,
       val: vote,
       cts: new Date().toISOString(),
     };
