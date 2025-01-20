@@ -20,11 +20,14 @@ import {
 import { env } from "./lib/env";
 
 const COM_ATPROTO_LABEL = "com.atproto.label.defs#label";
+const SOCIAL_PMSKY_LABEL = "social.pmsky.label";
 const SOCIAL_PMSKY_VOTE = "social.pmsky.vote";
 const ALL_SOCIAL_PMSKY_RECORDS = "social.pmsky.*";
 const DESIRED_COLLECTIONS = [
   // COM_ATPROTO_LABEL,
-  SOCIAL_PMSKY_VOTE,
+  // SOCIAL_PMSKY_LABEL,
+  // SOCIAL_PMSKY_VOTE,
+  ALL_SOCIAL_PMSKY_RECORDS,
 ];
 
 export function createIngester(db: Database, idResolver: IdResolver) {
@@ -47,7 +50,7 @@ export function createIngester(db: Database, idResolver: IdResolver) {
     logger.error(err, "jetstream error");
   });
 
-  jetstream.onCreate(COM_ATPROTO_LABEL, async (evt) => {
+  jetstream.onCreate(SOCIAL_PMSKY_LABEL, async (evt) => {
     if (
       isLabel(evt.commit.record) &&
       validateLabel(evt.commit.record).success
@@ -59,12 +62,12 @@ export function createIngester(db: Database, idResolver: IdResolver) {
     }
   });
 
-  jetstream.onUpdate(COM_ATPROTO_LABEL, async (evt) => {
+  jetstream.onUpdate(SOCIAL_PMSKY_LABEL, async (evt) => {
     logger.trace(evt, "updating label");
     saveLabel(db, evt);
   });
 
-  jetstream.onDelete(COM_ATPROTO_LABEL, async (evt) => {
+  jetstream.onDelete(SOCIAL_PMSKY_LABEL, async (evt) => {
     logger.trace(evt, "deleting label");
     await db
       .deleteFrom("labels")
@@ -103,8 +106,8 @@ export function createIngester(db: Database, idResolver: IdResolver) {
 async function saveLabel(
   db: Database,
   evt:
-    | CommitCreateEvent<"com.atproto.label.defs#label">
-    | CommitUpdateEvent<"com.atproto.label.defs#label">
+    | CommitCreateEvent<"social.pmsky.label">
+    | CommitUpdateEvent<"social.pmsky.label">
 ) {
   const record: Label = evt.commit.record as unknown as Label;
   const now = new Date();
