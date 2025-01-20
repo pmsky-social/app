@@ -87,11 +87,11 @@ export class AtprotoServiceAccount {
     return this.agent.did;
   }
 
-  private async putRecord(record: Record, recordType: string, rkey: string) {
+  private async putRecord(record: Record, collection: string, rkey: string) {
     let uri: string;
     const req = {
       repo: this.did(),
-      collection: recordType,
+      collection,
       rkey,
       record,
       validate: false,
