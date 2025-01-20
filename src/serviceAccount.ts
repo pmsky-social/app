@@ -20,10 +20,9 @@ import {
   LabelNotFound,
 } from "./error";
 import {
-  validateLabel,
-  Label as LabelRecord,
-  Label,
-} from "./lexicon/types/com/atproto/label/defs";
+  validateRecord as validateLabel,
+  Record as LabelRecord,
+} from "./lexicon/types/social/pmsky/label";
 import { VoteRepository } from "./db/voteRepository";
 import { Record as VoteRecord } from "./lexicon/types/social/pmsky/vote";
 
@@ -118,7 +117,7 @@ export class AtprotoServiceAccount {
     // Construct & validate label record
     const recordType = "com.atproto.label.defs#label";
     const rkey = TID.nextStr();
-    const record: Label = {
+    const record: LabelRecord = {
       $type: recordType,
       src: this.did(),
       uri: subject,

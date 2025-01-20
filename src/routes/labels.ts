@@ -111,6 +111,7 @@ export class PostLabel extends ContextualHandler {
         const uri = await ctx.atSvcAct.publishLabel(label, subject);
         return res.redirect(`/label/${uri}`);
       } catch (e) {
+        ctx.logger.error(e, "error publishing label");
         if (e instanceof InvalidRecord) {
           // todo: is this the right way to handle errors?
           return res.type("html").send(
