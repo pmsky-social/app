@@ -217,7 +217,8 @@ export class AtprotoServiceAccount {
       throw new AlreadyVoted(labelUri);
     if (vote !== 1 && vote !== -1) throw new InvalidVote(vote);
 
-    const recordType = "social.pmsky.label.vote";
+    // TODO: move this to a constant somewhere
+    const recordType = "social.pmsky.vote";
     const rkey = TID.nextStr();
     const record: VoteRecord = {
       $type: recordType,
