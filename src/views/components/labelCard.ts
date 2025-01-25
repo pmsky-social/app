@@ -1,4 +1,4 @@
-import { HomepageLabel } from "#/pages/home";
+import { HomepageLabel } from "#/views/pages/home";
 import { html } from "#/lib/view";
 
 export function labelCard(label: HomepageLabel) {

@@ -48,9 +48,9 @@ export class Server {
     const oauthClient = await createClient(db);
     const baseIdResolver = createIdResolver();
     const ingester = createJetstreamIngester(db, baseIdResolver);
-    const backfiller = new Backfiller(db, baseIdResolver);
     const resolver = createBidirectionalResolver(baseIdResolver);
     const atSvcAct = await AtprotoServiceAccount.create(db, logger);
+    const backfiller = new Backfiller(db, atSvcAct);
     const ctx: AppContext = {
       db,
       ingester,
@@ -61,8 +61,8 @@ export class Server {
     };
 
     // Subscribe to events on the firehose
+    await backfiller.run();
     if (ingester) ingester.start();
-    await backfiller.createFirehose();
 
     // Create our server
     const app: Express = express();

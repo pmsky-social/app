@@ -200,8 +200,11 @@ export class AtprotoServiceAccount {
     let query = this.db.selectFrom("labels").select("rkey");
 
     if (labelUri) {
-      const rkey = labelUri.split("/")[-1];
+      const rkey = labelUri.split("/").pop();
       const src = labelUri.split("/")[2];
+      if (rkey === undefined) {
+        throw new BadRequest("missing rkey");
+      }
       query = query.where("rkey", "=", rkey).where("src", "=", src);
     } else if (labelValue && subject) {
       query = query
@@ -263,5 +266,15 @@ export class AtprotoServiceAccount {
         "failed to update computed view; ignoring as it should be caught by the firehose"
       );
     }
+  }
+
+  async fetchRecords(collection: string) {
+    this.logger.trace({ collection }, "fetching records");
+    const records = await this.agent.com.atproto.repo.listRecords({
+      repo: this.did(),
+      collection,
+    });
+    this.logger.trace({ records }, "got response");
+    return records.data.records;
   }
 }

@@ -18,14 +18,18 @@ export type DatabaseSchema = {
   cursor_log: CursorLog;
 };
 
-export type Label = {
-  rkey: string; // primary key
-  src: string; // who created the label (always the service act did)
-  val: string; // the label itself
-  subject: string; // the URI of the resource this label applies to
+export class Label {
+  rkey!: string; // primary key
+  src!: string; // who created the label (always the service act did)
+  val!: string; // the label itself
+  subject!: string; // the URI of the resource this label applies to
   embed: string | undefined; // the embedded version of the post
-  createdAt: string;
-  indexedAt: string;
+  createdAt!: string;
+  indexedAt!: string;
+}
+
+export const uri = (l: Label): string => {
+  return `at://${l.src}/social.pmsky.label/${l.rkey}`;
 };
 
 export type Post = {
