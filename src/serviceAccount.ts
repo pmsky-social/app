@@ -64,7 +64,8 @@ export class AtprotoServiceAccount {
       if (session_data) {
         logger.trace("resuming session");
         await agent.resumeSession(session_data);
-      } else {
+      }
+      if (agent.did === undefined) {
         logger.trace("creating session by logging in");
         await agent.login({
           identifier: SVC_ACT_EMAIL,
