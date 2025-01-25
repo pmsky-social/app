@@ -15,6 +15,7 @@ export type DatabaseSchema = {
   label_votes: LabelVote; // keeps track of vote values, these are separate for anonymity
   auth_session: AuthSession;
   auth_state: AuthState;
+  cursor_log: CursorLog;
 };
 
 export type Label = {
@@ -63,6 +64,11 @@ export type AuthState = {
 type AuthStateJson = string;
 
 type AuthSessionJson = string;
+
+export type CursorLog = {
+  datetime: number;
+  cursor: number;
+};
 
 // Migrations
 
@@ -118,6 +124,19 @@ migrations["001"] = {
     await db.schema.dropTable("labels").execute();
     await db.schema.dropTable("user_votes").execute();
     await db.schema.dropTable("label_votes").execute();
+  },
+};
+
+migrations["002"] = {
+  async up(db: Kysely<unknown>) {
+    await db.schema
+      .createTable("cursor_log")
+      .addColumn("datetime", "datetime", (col) => col.notNull())
+      .addColumn("cursor", "bigint", (col) => col.notNull())
+      .execute();
+  },
+  async down(db: Kysely<unknown>) {
+    await db.schema.dropTable("cursor_log").execute();
   },
 };
 

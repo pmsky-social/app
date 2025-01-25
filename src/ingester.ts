@@ -27,8 +27,8 @@ const DESIRED_COLLECTIONS = [
   ALL_SOCIAL_PMSKY_RECORDS,
 ];
 
-export function createIngester(db: Database, idResolver: IdResolver) {
-  const logger = pino({ name: "firehose", level: env.LOG_LEVEL });
+export function createJetstreamIngester(db: Database, idResolver: IdResolver) {
+  const logger = pino({ name: "jetstream", level: env.LOG_LEVEL });
   if (!env.PUBLISH_TO_ATPROTO) {
     logger.warn("PUBLISH_TO_ATPROTO off, not running ingester");
     return;
@@ -36,7 +36,7 @@ export function createIngester(db: Database, idResolver: IdResolver) {
   const jetstream = new Jetstream({
     wantedCollections: DESIRED_COLLECTIONS,
     wantedDids: [env.SVC_ACT_DID],
-    cursor: 1737429693000000,
+    cursor: 1736429693000000,
     // 3rd label created at:
     // cursor: 1737410063753314
     // 4th

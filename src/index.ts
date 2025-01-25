@@ -13,10 +13,11 @@ import {
   createBidirectionalResolver,
   createIdResolver,
 } from "#/id-resolver";
-import { createIngester } from "#/ingester";
+import { createJetstreamIngester } from "#/ingester";
 import { env } from "#/lib/env";
 import { createRouter } from "#/routes/router";
 import { AtprotoServiceAccount } from "./serviceAccount";
+import { Backfiller } from "./backfiller";
 
 // Application state passed to the router and elsewhere
 export type AppContext = {
@@ -46,7 +47,8 @@ export class Server {
     // Create the atproto utilities
     const oauthClient = await createClient(db);
     const baseIdResolver = createIdResolver();
-    const ingester = createIngester(db, baseIdResolver);
+    const ingester = createJetstreamIngester(db, baseIdResolver);
+    const backfiller = new Backfiller(db, baseIdResolver);
     const resolver = createBidirectionalResolver(baseIdResolver);
     const atSvcAct = await AtprotoServiceAccount.create(db, logger);
     const ctx: AppContext = {
@@ -60,6 +62,7 @@ export class Server {
 
     // Subscribe to events on the firehose
     if (ingester) ingester.start();
+    await backfiller.createFirehose();
 
     // Create our server
     const app: Express = express();
