@@ -18,6 +18,7 @@ import { env } from "#/lib/env";
 import { createRouter } from "#/routes/router";
 import { AtprotoServiceAccount } from "./serviceAccount";
 import { Backfiller } from "./backfiller";
+import path from "node:path";
 
 // Application state passed to the router and elsewhere
 export type AppContext = {
@@ -72,6 +73,7 @@ export class Server {
     const router = createRouter(ctx);
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
+    app.use("/public", express.static(path.join(__dirname, "public")));
     app.use(router);
     app.use((_req, res) => res.sendStatus(404));
 
