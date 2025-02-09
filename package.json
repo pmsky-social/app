@@ -8,8 +8,9 @@
   "private": true,
   "scripts": {
     "dev": "tsx watch --clear-screen=false src/index.ts | pino-pretty",
-    "build": "tsup",
-    "start": "npm run build && node dist/index.js",
+    "check": "tsc --strict",
+    "build": "npm run check && tsup",
+    "start": "node --experimental-modules dist/index.js",
     "lexgen": "lex gen-server ./src/lexicon ./lexicons/*",
     "clean": "rimraf dist coverage"
   },
