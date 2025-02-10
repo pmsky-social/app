@@ -5,7 +5,8 @@
  */
 
 import pino, { Logger } from "pino";
-import { Database, type Label, type LabelVote } from "./db/db";
+import { Database } from "./db/migrations";
+import { ProposalType, type Proposal, type ProposalVote } from "./db/types";
 import { env } from "./lib/env";
 import { IdResolver } from "@atproto/identity";
 import { Firehose, MemoryRunner } from "@atproto/sync";
@@ -36,7 +37,7 @@ export class Backfiller {
     return { labels, votes };
   }
 
-  async fetchLabels(): Promise<Label[]> {
+  async fetchLabels(): Promise<Proposal[]> {
     const collection = "social.pmsky.label";
     const records: Record[] = await this.agent.fetchRecords(collection);
 
@@ -44,7 +45,7 @@ export class Backfiller {
     return records.map(transformLabel);
   }
 
-  async fetchLabelVotes(): Promise<LabelVote[]> {
+  async fetchLabelVotes(): Promise<ProposalVote[]> {
     const collection = "social.pmsky.vote";
     const records: Record[] = await this.agent.fetchRecords(collection);
     return records.map((record) => {
@@ -59,26 +60,26 @@ export class Backfiller {
     });
   }
 
-  async saveLabels(labels: Label[]) {
-    this.logger.trace(labels, "saving labels");
+  async saveLabels(labels: Proposal[]) {
+    // this.logger.trace(labels, "saving labels");
     await this.db
-      .insertInto("labels")
+      .insertInto("proposals")
       .values(labels)
       .onConflict((oc) => oc.column("rkey").doNothing())
       .execute();
   }
 
-  async saveLabelVotes(votes: LabelVote[]) {
-    this.logger.trace(votes, "saving votes");
+  async saveLabelVotes(votes: ProposalVote[]) {
+    // this.logger.trace(votes, "saving votes");
     await this.db
-      .insertInto("label_votes")
+      .insertInto("proposal_votes")
       .values(votes)
       .onConflict((oc) => oc.column("uri").doNothing())
       .execute();
   }
 }
 
-const transformLabel = (record: Record): Label => {
+const transformLabel = (record: Record): Proposal => {
   const val: LabelRecord = record.value as unknown as LabelRecord;
   const rkey = record.uri.split("/").pop();
   if (rkey === undefined) {
@@ -90,12 +91,12 @@ const transformLabel = (record: Record): Label => {
   return {
     rkey,
     src: val.src,
+    type: ProposalType.POST_LABEL,
     val: val.val,
     subject: val.uri,
     createdAt: val.cts,
-    embed: undefined,
     indexedAt: new Date().toISOString(),
-  };
+  } as Proposal;
 };
 
 export class RelayBackfiller {

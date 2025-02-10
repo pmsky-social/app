@@ -1,4 +1,4 @@
-import type { Database } from "./db";
+import type { Database } from "../migrations";
 import { Logger } from "pino";
 
 export class VoteRepository {
@@ -21,7 +21,7 @@ export class VoteRepository {
   async getLabelScore(uri: string): Promise<number> {
     this.logger.trace(uri, `getting score for label: ${uri}`);
     const votes = await this.db
-      .selectFrom("label_votes")
+      .selectFrom("proposal_votes")
       .select("val")
       .where("subject", "=", uri)
       .execute();
@@ -32,7 +32,7 @@ export class VoteRepository {
 
   async getLabelScores(uris: string[]): Promise<{ [uri: string]: number }> {
     const votes = await this.db
-      .selectFrom("label_votes")
+      .selectFrom("proposal_votes")
       .select(["subject", "val"])
       .where("subject", "in", uris)
       .execute();
@@ -83,7 +83,7 @@ export class VoteRepository {
     createdAt: string
   ): Promise<void> {
     await this.db
-      .insertInto("label_votes")
+      .insertInto("proposal_votes")
       .values({
         uri: voteRecordUri,
         subject: labelUri,

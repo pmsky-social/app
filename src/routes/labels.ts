@@ -1,6 +1,6 @@
 import { embeddedPost } from "#/views/components/postEmbed";
-import { LabelRepository } from "#/db/labelRepository";
-import { VoteRepository } from "#/db/voteRepository";
+import { LabelRepository } from "#/db/repos/labelRepository";
+import { VoteRepository } from "#/db/repos/voteRepository";
 import { InvalidRecord, LabelExists } from "#/error";
 import { page } from "#/lib/view";
 import { Label } from "#/views/pages/Label";

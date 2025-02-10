@@ -5,6 +5,7 @@ import { login } from "#/views/pages/login";
 import type { AppContext } from "..";
 import { ContextualHandler } from "./ContextualHandler";
 import { getSession } from "./util";
+import { AllowedUsersRepository } from "#/db/repos/allowedUsersRepository";
 
 export class GetLogin extends ContextualHandler {
   constructor(ctx: AppContext) {
@@ -22,7 +23,7 @@ export class PostLogin extends ContextualHandler {
       if (typeof handle !== "string" || !isValidHandle(handle)) {
         return res.type("html").send(page(login({ error: "invalid handle" })));
       }
-      if (!isWhitelistedHandle(handle)) {
+      if (!(await isWhitelistedHandle(ctx, handle))) {
         return res
           .type("html")
           .send(page(login({ error: "unauthorized handle" })));
@@ -61,12 +62,10 @@ export class PostLogout extends ContextualHandler {
   }
 }
 
-function isWhitelistedHandle(handle: string) {
-  const whitelistedHandles = [
-    "drewmca.dev",
-    "pmsky.social",
-    "alliejorlin.bsky.social",
-    "ntnsndr.in",
-  ];
+async function isWhitelistedHandle(ctx: AppContext, handle: string) {
+  // todo: maybe fetch this list at server startup? unless this db gets updated based on votes
+  const repo = new AllowedUsersRepository(ctx.db);
+  const whitelistedHandles = await repo.getWhitelistedHandles();
+  ctx.logger.trace("whitelisted handles", whitelistedHandles);
   return whitelistedHandles.includes(handle);
 }

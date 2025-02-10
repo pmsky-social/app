@@ -6,7 +6,7 @@ import { home } from "#/views/pages/home";
 import type { AppContext } from "..";
 import { ContextualHandler } from "./ContextualHandler";
 import { getSessionAgent } from "./util";
-import { VoteRepository } from "#/db/voteRepository";
+import { VoteRepository } from "#/db/repos/voteRepository";
 
 export class GetHomePage extends ContextualHandler {
   constructor(ctx: AppContext) {
@@ -53,8 +53,8 @@ export class GetHomePage extends ContextualHandler {
   }
 
   async getLabels(agent: Agent): Promise<HomepageLabel[]> {
-    let labels = await this.ctx.db
-      .selectFrom("labels")
+    const labels = await this.ctx.db
+      .selectFrom("proposals")
       .selectAll()
       .orderBy("indexedAt", "desc")
       .limit(10)
@@ -63,6 +63,21 @@ export class GetHomePage extends ContextualHandler {
     const labelUris = labels.map(
       (l) => `at://${l.src}/social.pmsky.label/${l.rkey}`
     );
+
+    const embeds = await this.ctx.db
+      .selectFrom("posts")
+      .selectAll()
+      .where("uri", "in", labelUris)
+      .execute()
+      .then((rows) =>
+        rows.reduce(
+          (acc, row) => {
+            acc[row.uri] = row.embed;
+            return acc;
+          },
+          {} as Record<string, string>
+        )
+      );
 
     this.ctx.logger.trace(labelUris, "fetched labels for route /home");
     const alreadyVoted = await this.ctx.db
@@ -86,7 +101,13 @@ export class GetHomePage extends ContextualHandler {
     return await Promise.all(
       labels.map(
         async (l) =>
-          await homepageLabelFromDB(l, alreadyVoted, scores, this.ctx.db)
+          await homepageLabelFromDB(
+            l,
+            embeds[l.uri()],
+            alreadyVoted,
+            scores,
+            this.ctx.db
+          )
       )
     );
   }

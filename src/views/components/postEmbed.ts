@@ -1,5 +1,7 @@
-import { Database } from "#/db/db";
+import { Database } from "#/db/migrations";
 import { html } from "#/lib/view";
+import { env } from "node:process";
+import pino from "pino";
 
 export async function embeddedPost(db: Database, uri: string) {
   const postId = uri.split("/").pop();
@@ -21,9 +23,9 @@ function bskyUrl(atUri: string) {
 async function getCachedPostEmbed(db: Database, uri: string) {
   console.log("checking for cached embed");
   const cached = await db
-    .selectFrom("labels")
+    .selectFrom("posts")
     .select("embed")
-    .where("subject", "=", uri)
+    .where("uri", "=", uri)
     .executeTakeFirst();
 
   // @ts-ignore
@@ -33,19 +35,19 @@ async function getCachedPostEmbed(db: Database, uri: string) {
 }
 
 export async function fetchAndCachePostEmbed(db: Database, uri: string) {
+  const logger = pino({ name: "postEmbed", level: env.LOG_LEVEL });
   try {
     const embed = await getPostEmbed(uri);
-    console.log("caching embed");
     await db
-      .updateTable("labels")
-      .where("subject", "=", uri)
+      .updateTable("posts")
+      .where("uri", "=", uri)
       .set("embed", embed)
       .execute();
 
     // @ts-ignore
     return html([embed]);
   } catch (e) {
-    console.error(e);
+    logger.error(e);
     return html`<p>Failed to load post embed</p>`;
   }
 }

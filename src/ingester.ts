@@ -6,9 +6,9 @@ import {
 } from "@skyware/jetstream";
 
 import pino from "pino";
-import type { Database } from "#/db/db";
+import type { Database } from "#/db/migrations";
 import {
-  type Record as Label,
+  type Record as LabelRecord,
   isRecord as isLabel,
   validateRecord as validateLabel,
 } from "#/lexicon/types/social/pmsky/label";
@@ -19,6 +19,7 @@ import {
 } from "#/lexicon/types/social/pmsky/vote";
 import { env } from "./lib/env";
 import { SOCIAL_PMSKY_LABEL, SOCIAL_PMSKY_VOTE } from "./constants";
+import { Proposal, ProposalType } from "./db/types";
 
 const ALL_SOCIAL_PMSKY_RECORDS = "social.pmsky.*";
 const DESIRED_COLLECTIONS = [
@@ -79,7 +80,7 @@ export function createJetstreamIngester(db: Database, idResolver: IdResolver) {
   jetstream.onDelete(SOCIAL_PMSKY_LABEL, async (evt) => {
     logger.trace(evt, "deleting label");
     await db
-      .deleteFrom("labels")
+      .deleteFrom("proposals")
       .where("rkey", "=", evt.commit.rkey.toString())
       .execute();
   });
@@ -104,7 +105,7 @@ export function createJetstreamIngester(db: Database, idResolver: IdResolver) {
   jetstream.onDelete(SOCIAL_PMSKY_VOTE, async (evt) => {
     logger.trace(evt, "deleting vote");
     await db
-      .deleteFrom("label_votes")
+      .deleteFrom("proposal_votes")
       .where("uri", "=", evt.commit.rkey.toString())
       .execute();
   });
@@ -118,18 +119,19 @@ async function saveLabel(
     | CommitCreateEvent<"social.pmsky.label">
     | CommitUpdateEvent<"social.pmsky.label">
 ) {
-  const record: Label = evt.commit.record as unknown as Label;
+  const record: LabelRecord = evt.commit.record as unknown as LabelRecord;
   const now = new Date();
   await db
-    .insertInto("labels")
+    .insertInto("proposals")
     .values({
       rkey: evt.commit.rkey.toString(),
       src: evt.did,
+      type: ProposalType.POST_LABEL,
       val: record.val,
       subject: record.uri,
       createdAt: record.cts,
       indexedAt: now.toISOString(),
-    })
+    } as Proposal)
     .onConflict((oc) =>
       oc.column("rkey").doUpdateSet({
         val: record.val,
@@ -152,7 +154,7 @@ async function saveVote(
     throw new Error("invalid vote value");
   }
   await db
-    .insertInto("label_votes")
+    .insertInto("proposal_votes")
     .values({
       uri: evt.commit.rkey.toString(), // is this right?
       val: record.val,

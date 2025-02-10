@@ -1,8 +1,9 @@
 import { labelCard } from "#/views/components/labelCard";
 import { fetchAndCachePostEmbed } from "#/views/components/postEmbed";
-import { Database, Label, uri } from "#/db/db";
+import { Database } from "#/db/migrations";
 import { Hole, html } from "#/lib/view";
 import { shell } from "./shell";
+import { Proposal } from "#/db/types";
 
 export type HomepageLabel = {
   uri: string;
@@ -16,21 +17,22 @@ export type HomepageLabel = {
 };
 
 export async function homepageLabelFromDB(
-  l: Label,
+  l: Proposal,
+  embed: string | undefined,
   alreadyVoted: { subject: string }[],
   scores: { [uri: string]: number },
   db: Database
 ): Promise<HomepageLabel> {
   return {
-    uri: uri(l),
+    uri: l.uri(),
     val: l.val,
     subject: l.subject,
-    voted: alreadyVoted.some((v) => v.subject === uri(l)),
-    embed: l.embed
+    voted: alreadyVoted.some((v) => v.subject === l.uri()),
+    embed: embed
       ? // @ts-ignore
         html([l.embed])
       : await fetchAndCachePostEmbed(db, l.subject),
-    score: scores[uri(l)] || 0,
+    score: scores[l.uri()] || 0,
     createdAt: l.createdAt,
     indexedAt: l.indexedAt,
   };

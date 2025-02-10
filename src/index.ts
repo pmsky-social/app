@@ -6,8 +6,8 @@ import { pino } from "pino";
 
 import type { Jetstream } from "@skyware/jetstream";
 import { createClient } from "#/auth/client";
-import { createDb, migrateToLatest } from "#/db/db";
-import type { Database } from "#/db/db";
+import { createDb, migrateToLatest } from "#/db/migrations";
+import type { Database } from "#/db/migrations";
 import {
   type BidirectionalResolver,
   createBidirectionalResolver,

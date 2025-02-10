@@ -5,7 +5,7 @@ import type {
   NodeSavedState,
   NodeSavedStateStore,
 } from "@atproto/oauth-client-node";
-import type { Database } from "#/db/db";
+import type { Database } from "#/db/migrations";
 
 export class StateStore implements NodeSavedStateStore {
   constructor(private db: Database) {}

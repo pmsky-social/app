@@ -17,6 +17,9 @@ export function login(props: Props) {
 function content({ error }: Props) {
   return html`<div id="root">
     <div class="container">
+      ${error
+        ? html`<p class="error visible">Error: <i>${error}</i></p>`
+        : undefined}
       <form action="/login" method="post" class="login-form">
         <input
           type="text"
@@ -25,7 +28,6 @@ function content({ error }: Props) {
           required
         />
         <button type="submit">Log in</button>
-        ${error ? html`<p>Error: <i>${error}</i></p>` : undefined}
       </form>
       <div class="signup-cta">
         Don't have an account on the Atmosphere?

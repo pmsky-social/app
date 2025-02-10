@@ -10,7 +10,7 @@ import { v4 as uuid } from "uuid";
 import { env } from "#/lib/env";
 import { SvcActCredsStore } from "./auth/storage";
 import { SOCIAL_PMSKY_LABEL, SVC_ACT_SESSION_KEY } from "./constants";
-import type { Database } from "./db/db";
+import type { Database } from "./db/migrations";
 import {
   AlreadyVoted,
   BadRequest,
@@ -23,8 +23,9 @@ import {
   validateRecord as validateLabel,
   Record as LabelRecord,
 } from "./lexicon/types/social/pmsky/label";
-import { VoteRepository } from "./db/voteRepository";
+import { VoteRepository } from "./db/repos/voteRepository";
 import { Record as VoteRecord } from "./lexicon/types/social/pmsky/vote";
+import { Proposal, ProposalType } from "./db/types";
 
 ///
 /// this agent is used to perform actions on behalf of the platform,
@@ -62,7 +63,7 @@ export class AtprotoServiceAccount {
       const store = new SvcActCredsStore(db);
       const session_data = await store.get(SVC_ACT_SESSION_KEY);
       if (session_data) {
-        logger.trace("resuming session");
+        logger.trace("resuming svc account session");
         await agent.resumeSession(session_data);
       }
       if (agent.did === undefined) {
@@ -108,7 +109,7 @@ export class AtprotoServiceAccount {
     if (env.PUBLISH_TO_ATPROTO) {
       this.logger.trace(req, "publishing record to atproto");
       const res = await this.agent.com.atproto.repo.putRecord(req);
-      this.logger.trace(res, "got response");
+      // this.logger.trace(res, "got response");
       uri = res.data.uri;
     } else {
       this.logger.warn(
@@ -143,6 +144,7 @@ export class AtprotoServiceAccount {
 
     // todo: make sure if this fails, it's handled correctly
     const uri = await this.putRecord(record, SOCIAL_PMSKY_LABEL, rkey);
+    this.logger.trace({ uri }, "published label to atproto");
 
     try {
       // Optimistically update our SQLite
@@ -150,15 +152,16 @@ export class AtprotoServiceAccount {
       // handled in #/firehose/ingestor.ts, but it ensures that future reads
       // will be up-to-date after this method finishes.
       await this.db
-        .insertInto("labels")
+        .insertInto("proposals")
         .values({
           rkey,
           src: record.src,
+          type: ProposalType.POST_LABEL,
           val: record.val,
           subject,
           createdAt: record.cts,
           indexedAt: new Date().toISOString(),
-        })
+        } as Proposal)
         .execute();
       this.logger.trace("saved new label to local db");
     } catch (err) {
@@ -173,7 +176,7 @@ export class AtprotoServiceAccount {
 
   private async getLabelUri(label: string, subject: string) {
     const row = await this.db
-      .selectFrom("labels")
+      .selectFrom("proposals")
       .select("rkey")
       .select("src")
       .where("val", "=", label)
@@ -197,7 +200,7 @@ export class AtprotoServiceAccount {
     labelValue?: string;
     subject?: string;
   }): Promise<boolean> {
-    let query = this.db.selectFrom("labels").select("rkey");
+    let query = this.db.selectFrom("proposals").select("rkey");
 
     if (labelUri) {
       const rkey = labelUri.split("/").pop();
@@ -269,12 +272,12 @@ export class AtprotoServiceAccount {
   }
 
   async fetchRecords(collection: string) {
-    this.logger.trace({ collection }, "fetching records");
+    // this.logger.trace({ collection }, "fetching records");
     const records = await this.agent.com.atproto.repo.listRecords({
       repo: this.did(),
       collection,
     });
-    this.logger.trace({ records }, "got response");
+    // this.logger.trace({ records }, "got response");
     return records.data.records;
   }
 }
