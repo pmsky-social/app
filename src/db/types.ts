@@ -14,6 +14,11 @@ export enum ProposalType {
   ALLOWED_USER = "allowed_user",
 }
 
+export const ALL_PROPOSAL_TYPES = [
+  ProposalType.POST_LABEL,
+  ProposalType.ALLOWED_USER,
+];
+
 export class Proposal {
   rkey!: string; // primary key
   src!: string; // who created the label (always the service act did)

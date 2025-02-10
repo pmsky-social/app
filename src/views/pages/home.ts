@@ -59,15 +59,15 @@ function content({ labels, profile }: Props) {
   return html`
     <div class="container">
       <div>${logout(profile)}</div>
-      <div>${createLabelLink()}</div>
+      <div>${createProposalLink()}</div>
       <div>${feed(labels)}</div>
     </div>
   `;
 }
 
-function createLabelLink() {
+function createProposalLink() {
   return html`<p>
-    <a href="/labels/create"
+    <a href="/proposals/create"
       ><button title="Create a new label">Create</button></a
     >
   </p>`;

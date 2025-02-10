@@ -26,6 +26,10 @@ export function shell({
       <title>${title}</title>
       <link rel="stylesheet" href="/public/styles.css" />
       <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+      <script
+        src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+        defer
+      ></script>
     </head>
     <body>
       <div class="${errorClass}">${msg}</div>

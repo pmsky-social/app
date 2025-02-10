@@ -3,7 +3,8 @@ import express from "express";
 import type { AppContext } from "#/index";
 import type { ContextualHandler } from "./ContextualHandler";
 import { GetHomePage } from "./home";
-import { GetLabel, GetLabelsCreate, PostLabel } from "./labels";
+import { GetCreate } from "./proposals";
+import { GetLabel, PostLabel as PostProposal } from "./labels";
 import { GetLogin, PostLogin, PostLogout } from "./login";
 import { GetClientMetadata, GetOauthCallback } from "./oauth";
 import { PostVote } from "./vote";
@@ -39,9 +40,9 @@ export const createRouter = (ctx: AppContext) => {
   router.get("/login", handler(new GetLogin(ctx)));
   router.post("/login", handler(new PostLogin(ctx)));
   router.post("/logout", handler(new PostLogout(ctx)));
-  router.get("/labels/create", handler(new GetLabelsCreate(ctx)));
+  router.get("/proposals/create", handler(new GetCreate(ctx)));
   router.get("/label/:rkey", handler(new GetLabel(ctx)));
-  router.post("/label", handler(new PostLabel(ctx)));
+  router.post("/proposal", handler(new PostProposal(ctx)));
   router.post("/vote", handler(new PostVote(ctx)));
   router.get("/", handler(new GetHomePage(ctx)));
 

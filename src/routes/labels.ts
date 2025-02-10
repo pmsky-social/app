@@ -4,23 +4,13 @@ import { VoteRepository } from "#/db/repos/voteRepository";
 import { InvalidRecord, LabelExists } from "#/error";
 import { page } from "#/lib/view";
 import { Label } from "#/views/pages/Label";
-import { createLabel } from "#/views/pages/createLabel";
+import { createProposal } from "#/views/pages/createProposal";
 import { HomepageLabel } from "#/views/pages/home";
 import type { AppContext } from "..";
 import { ContextualHandler } from "./ContextualHandler";
 import { getSessionAgent } from "./util";
-
-const ALLOWED_LABEL_VALUES = ["test", "test2"];
-
-export class GetLabelsCreate extends ContextualHandler {
-  constructor(ctx: AppContext) {
-    super(ctx, async (req, res) => {
-      return res
-        .type("html")
-        .send(page(createLabel({ allowedLabelValues: ALLOWED_LABEL_VALUES })));
-    });
-  }
-}
+import { ALLOWED_LABEL_VALUES } from "./proposals";
+import { ALL_PROPOSAL_TYPES } from "#/db/types";
 
 export class GetLabel extends ContextualHandler {
   constructor(ctx: AppContext) {
@@ -83,7 +73,8 @@ export class PostLabel extends ContextualHandler {
         );
         return res.type("html").send(
           page(
-            createLabel({
+            createProposal({
+              proposalTypes: ALL_PROPOSAL_TYPES,
               allowedLabelValues: ALLOWED_LABEL_VALUES,
               error: "label not allowed.",
             })
@@ -98,7 +89,8 @@ export class PostLabel extends ContextualHandler {
         } catch (e) {
           return res.type("html").send(
             page(
-              createLabel({
+              createProposal({
+                proposalTypes: ALL_PROPOSAL_TYPES,
                 allowedLabelValues: ALLOWED_LABEL_VALUES,
                 error: "expected AT URI or link to a bsky post.",
               })
@@ -117,7 +109,8 @@ export class PostLabel extends ContextualHandler {
           // todo: is this the right way to handle errors?
           return res.type("html").send(
             page(
-              createLabel({
+              createProposal({
+                proposalTypes: ALL_PROPOSAL_TYPES,
                 allowedLabelValues: ALLOWED_LABEL_VALUES,
                 error: "label failed validation",
               })
@@ -131,7 +124,8 @@ export class PostLabel extends ContextualHandler {
 
         return res.type("html").send(
           page(
-            createLabel({
+            createProposal({
+              proposalTypes: ALL_PROPOSAL_TYPES,
               allowedLabelValues: ALLOWED_LABEL_VALUES,
               error: `unknown server error: ${e}`,
             })
