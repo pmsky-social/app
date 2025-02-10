@@ -10,7 +10,9 @@ import type { AppContext } from "..";
 import { ContextualHandler } from "./ContextualHandler";
 import { getSessionAgent } from "./util";
 import { ALLOWED_LABEL_VALUES } from "./proposals";
-import { ALL_PROPOSAL_TYPES } from "#/db/types";
+import { ALL_PROPOSAL_TYPES, ProposalType } from "#/db/types";
+import { Agent } from "@atproto/api";
+import type express from "express";
 
 export class GetLabel extends ContextualHandler {
   constructor(ctx: AppContext) {
@@ -52,87 +54,93 @@ export class PostLabel extends ContextualHandler {
       ctx.logger.trace(req.body, "got request to POST /label");
       const agent = await getSessionAgent(req, res, ctx);
       if (!agent) return res.sendStatus(403);
-      if (!ctx.atSvcAct.hasValidSession()) {
-        ctx.logger.warn("svc account credentials expired");
+
+      if (req.body.type === ProposalType.POST_LABEL) {
+        return this.createPostLabelProposal(req, res, agent);
+      } else if (req.body.type === ProposalType.ALLOWED_USER) {
+        return this.createAllowedUserProposal(req, res, agent);
+      } else {
         return res
-          .status(401)
-          .type("html")
-          .send(
-            "<h1>Server Error: our service account's credentials expired.  Please try again after we fix it.</h1>"
-          );
-      }
-
-      const label = req.body.label;
-      let subject = req.body.subject;
-      ctx.logger.info(`label: ${label}`);
-      ctx.logger.info(`subject: ${subject}`);
-
-      if (!isAllowed(label)) {
-        ctx.logger.warn(
-          `${agent.did} attempted to create invalid label: ${label}`
-        );
-        return res.type("html").send(
-          page(
-            createProposal({
-              proposalTypes: ALL_PROPOSAL_TYPES,
-              allowedLabelValues: ALLOWED_LABEL_VALUES,
-              error: "label not allowed.",
-            })
-          )
-        );
-      }
-
-      if (!subject.startsWith("at://")) {
-        ctx.logger.trace(`transforming subject to at:// uri: ${subject}`);
-        try {
-          subject = transformToAtUri(subject);
-        } catch (e) {
-          return res.type("html").send(
-            page(
-              createProposal({
-                proposalTypes: ALL_PROPOSAL_TYPES,
-                allowedLabelValues: ALLOWED_LABEL_VALUES,
-                error: "expected AT URI or link to a bsky post.",
-              })
-            )
-          );
-        }
-        ctx.logger.trace(`transformed subject to at:// uri: ${subject}`);
-      }
-
-      try {
-        const rkey = await ctx.atSvcAct.publishLabel(label, subject);
-        return res.redirect(`/label/${rkey}`);
-      } catch (e) {
-        ctx.logger.error(e, "error publishing label");
-        if (e instanceof InvalidRecord) {
-          // todo: is this the right way to handle errors?
-          return res.type("html").send(
-            page(
-              createProposal({
-                proposalTypes: ALL_PROPOSAL_TYPES,
-                allowedLabelValues: ALLOWED_LABEL_VALUES,
-                error: "label failed validation",
-              })
-            )
-          );
-        }
-
-        if (e instanceof LabelExists) {
-          return res.redirect(`/label/${e.existingUri}?error=exists`);
-        }
-
-        return res.type("html").send(
-          page(
-            createProposal({
-              proposalTypes: ALL_PROPOSAL_TYPES,
-              allowedLabelValues: ALLOWED_LABEL_VALUES,
-              error: `unknown server error: ${e}`,
-            })
-          )
-        );
+          .status(400)
+          .send(backToPageWithErrorMsg("invalid proposal type"));
       }
     });
+  }
+
+  async createPostLabelProposal(
+    req: express.Request,
+    res: express.Response,
+    agent: Agent
+  ) {
+    const label = req.body.label;
+    let subject = req.body.subject;
+    this.ctx.logger.info(`label: ${label}`);
+    this.ctx.logger.info(`subject: ${subject}`);
+
+    if (!isAllowed(label)) {
+      this.ctx.logger.warn(
+        `${agent.did} attempted to create invalid label: ${label}`
+      );
+      return res
+        .type("html")
+        .send(backToPageWithErrorMsg("label not allowed."));
+    }
+
+    if (!subject.startsWith("at://")) {
+      this.ctx.logger.trace(`transforming subject to at:// uri: ${subject}`);
+      try {
+        subject = transformToAtUri(subject);
+      } catch (e) {
+        return res
+          .type("html")
+          .send(
+            backToPageWithErrorMsg("expected AT URI or link to a bsky post.")
+          );
+      }
+      this.ctx.logger.trace(`transformed subject to at:// uri: ${subject}`);
+    }
+
+    if (!this.ctx.atSvcAct.hasValidSession()) {
+      this.ctx.logger.warn("svc account credentials expired");
+      return res
+        .status(503)
+        .type("html")
+        .header({ "Retry-After": "1 * 60 * 60" })
+        .send(
+          "<h1>Server Error: our service account's credentials expired.  Please try again after we fix it.</h1>"
+        );
+    }
+
+    try {
+      const rkey = await this.ctx.atSvcAct.publishLabel(label, subject);
+      return res.redirect(`/label/${rkey}`);
+    } catch (e) {
+      this.ctx.logger.error(e, "error publishing label");
+      if (e instanceof InvalidRecord) {
+        // todo: is this the right way to handle errors?
+        return res
+          .type("html")
+          .send(backToPageWithErrorMsg("label failed validation"));
+      }
+
+      if (e instanceof LabelExists) {
+        return res.redirect(`/label/${e.existingUri}?error=exists`);
+      }
+
+      return res
+        .type("html")
+        .send(backToPageWithErrorMsg(`unknown server error: ${e}`));
+    }
+  }
+
+  async createAllowedUserProposal(
+    req: express.Request,
+    res: express.Response,
+    agent: Agent
+  ) {
+    const handle = req.body.handle;
+
+    // todo: continue here with handling serverside response to allow user request
   }
 }
 
@@ -158,3 +166,13 @@ function transformToAtUri(uri: string): string {
 // test transformToAtUri
 // url: https://bsky.app/profile/drewmca.dev/post/3ld34i7vl722w
 // uri: at://drewmca.dev/app.bsky.feed.post/3ld34i7vl722w
+
+function backToPageWithErrorMsg(msg: string) {
+  return page(
+    createProposal({
+      proposalTypes: ALL_PROPOSAL_TYPES,
+      allowedLabelValues: ALLOWED_LABEL_VALUES,
+      error: msg,
+    })
+  );
+}

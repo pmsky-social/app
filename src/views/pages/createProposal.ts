@@ -75,7 +75,6 @@ function ProposePostLabelComponents(allowedLabelValues: string[]) {
           hx-post="/api/embedPost"
           hx-trigger="input changed delay:200ms"
           hx-target="#oembed-preview"
-          required
         />
       </div>
 
@@ -88,6 +87,7 @@ function ProposePostLabelComponents(allowedLabelValues: string[]) {
 
       <input type="hidden" name="oembedHtml" id="oembedHtml" />
       <select type="text" name="label" placeholder="Choose a label" required>
+        <option value="">Select a label</option>
         ${allowedLabelValues.map(labelValueOption)}
       </select>
       <script>
@@ -134,7 +134,12 @@ function ProposePostLabelComponents(allowedLabelValues: string[]) {
 }
 
 function ProposeAllowedUserComponents() {
-  return html`<p x-show="proposalType === 'allowed_user'">
-    <input type="text" name="handle" placeholder="Enter a handle" required />
-  </p>`;
+  return html`<div x-show="proposalType === 'allowed_user'">
+    <input
+      name="handle"
+      type="text"
+      name="handle"
+      placeholder="Enter a handle"
+    />
+  </div>`;
 }
