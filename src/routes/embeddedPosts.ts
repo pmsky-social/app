@@ -15,7 +15,7 @@ export class PostEmbeddedPost extends ContextualHandler {
       }
 
       try {
-        const postfragment = await embeddedPost(ctx.db, url);
+        const postfragment = await embeddedPost(ctx, url);
         res.send(page(postfragment));
       } catch (err) {
         ctx.logger.error("Error fetching oEmbed:", err);

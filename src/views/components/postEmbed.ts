@@ -1,13 +1,11 @@
-import { Database } from "#/db/migrations";
+import { AppContext } from "#/index";
 import { html } from "#/lib/view";
-import { env } from "node:process";
-import pino from "pino";
 
-export async function embeddedPost(db: Database, uri: string) {
+export async function embeddedPost(ctx: AppContext, uri: string) {
   const postId = uri.split("/").pop();
   if (!postId) return html`<p>Invalid post URI: ${uri}</p>`;
   const elId = `post-embed-${postId}`;
-  const embedded = await getCachedPostEmbed(db, uri);
+  const embedded = await getCachedPostEmbed(ctx, uri);
   return html` <div id="${elId}" class="post-embed">${embedded}</div> `;
 }
 
@@ -20,9 +18,9 @@ function bskyUrl(atUri: string) {
   return `https://bsky.app/profile/${author}/post/${postId}`;
 }
 
-async function getCachedPostEmbed(db: Database, uri: string) {
-  console.log("checking for cached embed");
-  const cached = await db
+export async function getCachedPostEmbed(ctx: AppContext, uri: string) {
+  ctx.logger.trace("checking for cached embed");
+  const cached = await ctx.db
     .selectFrom("posts")
     .select("embed")
     .where("uri", "=", uri)
@@ -31,23 +29,22 @@ async function getCachedPostEmbed(db: Database, uri: string) {
   // @ts-ignore
   if (cached) return html([cached.embed]);
 
-  return await fetchAndCachePostEmbed(db, uri);
+  return await fetchAndCachePostEmbed(ctx, uri);
 }
 
-export async function fetchAndCachePostEmbed(db: Database, uri: string) {
-  const logger = pino({ name: "postEmbed", level: env.LOG_LEVEL });
+async function fetchAndCachePostEmbed(ctx: AppContext, uri: string) {
   try {
     const embed = await getPostEmbed(uri);
-    await db
-      .updateTable("posts")
-      .where("uri", "=", uri)
-      .set("embed", embed)
+    await ctx.db
+      .insertInto("posts")
+      .values({ uri, embed })
+      .onConflict((oc) => oc.column("uri").doUpdateSet({ embed }))
       .execute();
 
     // @ts-ignore
     return html([embed]);
   } catch (e) {
-    logger.error(e);
+    ctx.logger.error(e);
     return html`<p>Failed to load post embed</p>`;
   }
 }

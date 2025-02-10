@@ -3,7 +3,7 @@ import { Database } from "../migrations";
 export class AllowedUsersRepository {
   constructor(private db: Database) {}
 
-  getWhitelistedHandles() {
+  async getWhitelistedHandles() {
     return this.db
       .selectFrom("allowed_users")
       .selectAll()

@@ -23,8 +23,31 @@ export class Proposal {
   createdAt!: string;
   indexedAt!: string;
 
+  constructor(
+    rkey: string,
+    src: string,
+    type: ProposalType,
+    val: string,
+    subject: string,
+    createdAt: string,
+    indexedAt: string
+  ) {
+    this.rkey = rkey;
+    this.src = src;
+    this.type = type;
+    this.val = val;
+    this.subject = subject;
+    this.createdAt = createdAt;
+    this.indexedAt = indexedAt;
+  }
+
   uri(): string {
     return `at://${this.src}/social.pmsky.label/${this.rkey}`;
+  }
+
+  static fromDB(row: DatabaseSchema["proposals"]) {
+    const { rkey, src, type, val, subject, createdAt, indexedAt } = row;
+    return new Proposal(rkey, src, type, val, subject, createdAt, indexedAt);
   }
 }
 

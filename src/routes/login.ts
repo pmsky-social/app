@@ -66,6 +66,9 @@ async function isWhitelistedHandle(ctx: AppContext, handle: string) {
   // todo: maybe fetch this list at server startup? unless this db gets updated based on votes
   const repo = new AllowedUsersRepository(ctx.db);
   const whitelistedHandles = await repo.getWhitelistedHandles();
-  ctx.logger.trace("whitelisted handles", whitelistedHandles);
+  ctx.logger.trace(
+    "whitelisted handles {whitelistedHandles}",
+    whitelistedHandles
+  );
   return whitelistedHandles.includes(handle);
 }

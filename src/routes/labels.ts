@@ -40,7 +40,7 @@ export class GetLabel extends ContextualHandler {
       const voted = await votes.userVotedAlready(agent.did, labelUri);
       const score = await votes.getLabelScore(labelUri);
 
-      const embed = await embeddedPost(ctx.db, label.subject);
+      const embed = await embeddedPost(ctx, label.subject);
 
       const hydrated: HomepageLabel = {
         ...label,

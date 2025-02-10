@@ -7,6 +7,7 @@ import type { AppContext } from "..";
 import { ContextualHandler } from "./ContextualHandler";
 import { getSessionAgent } from "./util";
 import { VoteRepository } from "#/db/repos/voteRepository";
+import { Proposal } from "#/db/types";
 
 export class GetHomePage extends ContextualHandler {
   constructor(ctx: AppContext) {
@@ -58,7 +59,8 @@ export class GetHomePage extends ContextualHandler {
       .selectAll()
       .orderBy("indexedAt", "desc")
       .limit(10)
-      .execute();
+      .execute()
+      .then((rows) => rows.map((r) => Proposal.fromDB(r)));
 
     const labelUris = labels.map(
       (l) => `at://${l.src}/social.pmsky.label/${l.rkey}`
@@ -103,10 +105,10 @@ export class GetHomePage extends ContextualHandler {
         async (l) =>
           await homepageLabelFromDB(
             l,
-            embeds[l.uri()],
+            embeds[l.subject],
             alreadyVoted,
             scores,
-            this.ctx.db
+            this.ctx
           )
       )
     );
