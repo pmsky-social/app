@@ -1,0 +1,30 @@
+# the VM hosting the deployed app only has IPv6, which github does not support
+# so our CD pushes to a radicle mirror of the repository, and hits a webhook on the VM
+
+name: Radicle Mirror
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Radicle CLI (example)
+        run: curl -sSf https://radicle.xyz/install | sh
+
+      - name: Configure Git Remote for Radicle
+        run: |
+          # Add a new remote named "rad" for your Radicle project.
+          # Replace the URL below with your project's actual radicle URL.
+          git remote add rad || true
+          git remote set-url rad "rad://rad:z2swoV1DQeLYhiC6cAKmMHHEpWKvQ"
+
+      - name: Push to Radicle
+        run: |
+          # Force-push the main branch to your Radicle remote.
+          git push rad main
