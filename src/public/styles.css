@@ -2,21 +2,22 @@
   color-scheme: light dark;
 }
 
-body {
+:root {
   font-family: Arial, Helvetica, sans-serif;
 
-  --background-color: light-dark(#fff, #111);
-  --header-background-color: light-dark(#ddd, #333);
-  --card-background-color: light-dark(#fff, #111);
-  --border-color: light-dark(#ddd, #666);
-  --gray-fa: light-dark(#fafafa, #333);
-  --gray-9: light-dark(#999, #555);
-  --gray-7: light-dark(#777, #777);
-  --gray-6: light-dark(#666, #888);
-  --gray-5: light-dark(#555, #999);
-  --gray-3: light-dark(#333, #fafafa);
-  --black: light-dark(black, white);
-  --white: light-dark(white, black);
+  --background-color: #fff;
+  --header-background-color: #ddd;
+  --card-background-color: #fff;
+  --border-color: #ddd;
+  --gray-fa: #fafafa;
+  --gray-9: #999;
+  --gray-7: #777;
+  --gray-6: #666;
+  --gray-5: #555;
+  --gray-4: #444;
+  --gray-3: #333;
+  --black: black;
+  --white: white;
   --primary-100: #d2e7ff;
   --primary-200: #b1d3fa;
   --primary-400: #2e8fff;
@@ -24,6 +25,34 @@ body {
   --primary-600: #0066db;
   --error-500: #f00;
   --error-100: #fee;
+
+  --nc-lk-1: #0070F3
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background-color: #111;
+    --header-background-color: #333;
+    --card-background-color: #111;
+    --border-color: #666;
+    --gray-fa: #333;
+    --gray-9: #555;
+    --gray-7: #666;
+    --gray-6: #777;
+    --gray-5: #888;
+    --gray-4: #bbb;
+    --gray-3: #fafafa;
+    --black: white;
+    --white: black;
+    --primary-100: #d2e7ff;
+    --primary-200: #b1d3fa;
+    --primary-400: #2e8fff;
+    --primary-500: #0078ff;
+    --primary-600: #0066db;
+    --error-500: #f00;
+    --error-100: #fee;
+    --nc-lk-1: #2487f8;
+  }
 }
 
 /*
@@ -225,7 +254,6 @@ a .card {
   border-radius: 8px;
   padding: 16px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  max-width: 500px;
   margin: 20px auto;
   font-family: Arial, sans-serif;
 }
@@ -346,6 +374,8 @@ form.createProposal #cancel-button {
 
 header {
   margin-bottom: 1em;
+  padding-left: 0;
+  padding-right: 0;
 }
 
 .feed {
@@ -354,4 +384,16 @@ header {
 
 .feed .empty-feed {
   text-align: center;
+}
+
+.feed-header-text {
+  font-style: italic;
+  color: var(--gray-7)
+}
+
+p.create-help-text {
+  font-size: .9em;
+  text-align: left;
+  padding: 1em;
+  color: var(--gray-4);
 }

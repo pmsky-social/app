@@ -2,6 +2,7 @@ import { html } from "#/lib/view";
 import type { FeedProposal } from "./home";
 import { shell } from "./shell";
 import { proposalCard } from "#/views/components/labelCard";
+import { feedButtons } from "../components/buttons";
 
 // view an individual label
 type Props = {
@@ -22,5 +23,7 @@ export function Proposal(props: Props) {
 }
 
 function content({ proposal }: Props) {
-  return html` <div class="container">${proposalCard(proposal)}</div> `;
+  return html`
+    <div class="container">${feedButtons(true)} ${proposalCard(proposal)}</div>
+  `;
 }

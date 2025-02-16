@@ -96,7 +96,9 @@ export class PostProposal extends ContextualHandler {
       );
       return res
         .type("html")
-        .send(backToPageWithErrorMsg("label not allowed."));
+        .send(
+          backToPageWithErrorMsg("label not allowed.", ProposalType.POST_LABEL)
+        );
     }
 
     if (!subject.startsWith("at://")) {
@@ -107,7 +109,10 @@ export class PostProposal extends ContextualHandler {
         return res
           .type("html")
           .send(
-            backToPageWithErrorMsg("expected AT URI or link to a bsky post.")
+            backToPageWithErrorMsg(
+              "expected AT URI or link to a bsky post.",
+              ProposalType.POST_LABEL
+            )
           );
       }
       this.ctx.logger.trace(`transformed subject to at:// uri: ${subject}`);
@@ -133,7 +138,12 @@ export class PostProposal extends ContextualHandler {
         // todo: is this the right way to handle errors?
         return res
           .type("html")
-          .send(backToPageWithErrorMsg("label failed validation"));
+          .send(
+            backToPageWithErrorMsg(
+              "Label record failed validation",
+              ProposalType.POST_LABEL
+            )
+          );
       }
 
       if (e instanceof ProposalExists) {
@@ -151,15 +161,33 @@ export class PostProposal extends ContextualHandler {
     res: express.Response,
     agent: Agent
   ) {
-    const handle = req.body.handle;
+    let handle = req.body.handle;
+    if (handle.startsWith("@")) handle = handle.slice(1);
 
     if (!isValidHandle(handle)) {
       return res
         .type("html")
-        .send(backToPageWithErrorMsg(`Invalid handle: ${handle}`));
+        .send(
+          backToPageWithErrorMsg(
+            `Invalid handle: ${handle}`,
+            ProposalType.ALLOWED_USER
+          )
+        );
     }
 
-    const did = await agent.resolveHandle({ handle }).then((r) => r.data.did);
+    const did = await agent
+      .resolveHandle({ handle })
+      .then((r) => r.data.did)
+      .catch((e) => {
+        this.ctx.logger.error(e, "error resolving handle");
+      });
+
+    if (!did)
+      return res
+        .type("html")
+        .send(
+          backToPageWithErrorMsg(`Account not found`, ProposalType.ALLOWED_USER)
+        );
 
     const repo = new AllowedUsersRepository(this.ctx);
     const existing = await repo.getProposalByUser(did);
@@ -199,10 +227,10 @@ function transformToAtUri(uri: string): string {
 // url: https://bsky.app/profile/drewmca.dev/post/3ld34i7vl722w
 // uri: at://drewmca.dev/app.bsky.feed.post/3ld34i7vl722w
 
-function backToPageWithErrorMsg(msg: string) {
+function backToPageWithErrorMsg(msg: string, init?: ProposalType) {
   return page(
     createProposal({
-      // todo: initProposalType?
+      initProposalType: init,
       proposalTypes: ALL_PROPOSAL_TYPES,
       allowedLabelValues: ALLOWED_LABEL_VALUES,
       error: msg,

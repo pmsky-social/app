@@ -1,8 +1,10 @@
 import { ProposalType } from "#/db/types";
 import { type Hole, html } from "#/lib/view";
+import { metaLink } from "../components/buttons";
 import { shell } from "./shell";
 
 type Props = {
+  initProposalType?: ProposalType | undefined;
   proposalTypes: ProposalType[];
   allowedLabelValues: string[];
   error?: string;
@@ -29,11 +31,19 @@ function friendly(type: ProposalType) {
   }
 }
 
-function content({ error, allowedLabelValues, proposalTypes }: Props): Hole {
+function content({
+  error,
+  allowedLabelValues,
+  proposalTypes,
+  initProposalType,
+}: Props): Hole {
+  const init = initProposalType || "";
+  const xData = { proposalType: init };
   return html`
     <div class="container">
       ${error && html`<div class="error visible">${error}</div>`}
-      <div class="card" x-data="{ proposalType: '' }">
+      <div>${metaLink(true)}</div>
+      <div class="card" x-data="${JSON.stringify(xData)}">
         <form
           class="createProposal"
           action="/proposal"
@@ -65,6 +75,12 @@ function labelValueOption(labelValue: string) {
 function ProposePostLabelComponents(allowedLabelValues: string[]) {
   return html`
     <div x-show="proposalType === 'post_label'">
+      <p class="create-help-text">
+        Propose a label for a given post. This will submit a proposal to the
+        <i>Main</i> feed, where users can agree or disagree with the proposed
+        label. Those votes will be published as AT proto records, allowing
+        labelers to incorporate those votes into their decision-making.
+      </p>
       <div id="input-container">
         <input
           type="text"
@@ -134,6 +150,11 @@ function ProposePostLabelComponents(allowedLabelValues: string[]) {
 
 function ProposeAllowedUserComponents() {
   return html`<div x-show="proposalType === 'allowed_user'">
+    <p class="create-help-text">
+      Invite a user by their handle (eg alice.bsky.social). This will create a
+      proposal in the <i>Meta</i> feed. If the proposal has a non-negative
+      score, the user will be allowed to login.
+    </p>
     <input
       name="handle"
       type="text"
