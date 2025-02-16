@@ -19,6 +19,7 @@ import { createRouter } from "#/routes/router";
 import { AtprotoServiceAccount } from "./serviceAccount";
 import { Backfiller } from "./backfiller";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 // Application state passed to the router and elsewhere
 export type AppContext = {
@@ -68,6 +69,9 @@ export class Server {
     // Create our server
     const app: Express = express();
     app.set("trust proxy", true);
+
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
 
     // Routes & middlewares
     const router = createRouter(ctx);

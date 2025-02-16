@@ -1,8 +1,9 @@
 import assert from "node:assert";
-import AtpAgent, {
+import {
   type Agent,
   type AtpSessionData,
   type AtpSessionEvent,
+  AtpAgent,
 } from "@atproto/api";
 import { TID } from "@atproto/common";
 import type { Logger } from "pino";
@@ -99,13 +100,7 @@ export class AtprotoServiceAccount {
     rkey: string
   ) {
     let uri: string;
-    const req = {
-      repo: this.did(),
-      collection,
-      rkey,
-      record,
-      validate: false,
-    };
+    const req = { repo: this.did(), collection, rkey, record, validate: false };
     if (env.PUBLISH_TO_ATPROTO) {
       this.logger.trace(req, "publishing record to atproto");
       const res = await this.agent.com.atproto.repo.putRecord(req);

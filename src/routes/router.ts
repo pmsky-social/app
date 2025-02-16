@@ -1,4 +1,5 @@
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import express from "express";
 import type { AppContext } from "#/index";
 import type { ContextualHandler } from "./ContextualHandler";
@@ -27,12 +28,6 @@ const handler =
 
 export const createRouter = (ctx: AppContext) => {
   const router = express.Router();
-
-  // Static assets
-  router.use(
-    "/public",
-    express.static(path.join(__dirname, "..", "public")) // TODO: fix path to not need ".."
-  );
 
   router.get("/client-metadata.json", handler(new GetClientMetadata(ctx)));
   router.get("/oauth/callback", handler(new GetOauthCallback(ctx)));
