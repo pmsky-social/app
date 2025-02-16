@@ -8,7 +8,22 @@ on:
     branches: [ main ]
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build
+
   mirror:
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -21,7 +36,7 @@ jobs:
         run: |
           # Add a new remote named "rad" for your Radicle project.
           # Replace the URL below with your project's actual radicle URL.
-          git remote add rad || true
+          git remote add rad "rad://rad:z2swoV1DQeLYhiC6cAKmMHHEpWKvQ" || true
           git remote set-url rad "rad://rad:z2swoV1DQeLYhiC6cAKmMHHEpWKvQ"
 
       - name: Push to Radicle
