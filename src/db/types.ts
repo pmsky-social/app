@@ -27,6 +27,7 @@ export class Proposal {
   subject!: string; // the URI of the resource this label applies to
   createdAt!: string;
   indexedAt!: string;
+  indexedBy!: string;
 
   constructor(
     rkey: string,
@@ -35,7 +36,8 @@ export class Proposal {
     val: string,
     subject: string,
     createdAt: string,
-    indexedAt: string
+    indexedAt: string,
+    indexedBy: string
   ) {
     this.rkey = rkey;
     this.src = src;
@@ -44,6 +46,7 @@ export class Proposal {
     this.subject = subject;
     this.createdAt = createdAt;
     this.indexedAt = indexedAt;
+    this.indexedBy = indexedBy;
   }
 
   uri(): string {
@@ -51,8 +54,18 @@ export class Proposal {
   }
 
   static fromDB(row: DatabaseSchema["proposals"]) {
-    const { rkey, src, type, val, subject, createdAt, indexedAt } = row;
-    return new Proposal(rkey, src, type, val, subject, createdAt, indexedAt);
+    const { rkey, src, type, val, subject, createdAt, indexedAt, indexedBy } =
+      row;
+    return new Proposal(
+      rkey,
+      src,
+      type,
+      val,
+      subject,
+      createdAt,
+      indexedAt,
+      indexedBy
+    );
   }
 }
 
@@ -69,6 +82,7 @@ export type UserVote = {
   subject: string; // the URI of the resource this vote applies to
   createdAt: string;
   indexedAt: string;
+  indexedBy: string;
 };
 
 // this struct more closely matches the ATP records
@@ -78,6 +92,7 @@ export type ProposalVote = {
   subject: string; // URI of the proposal voted on
   createdAt: string;
   indexedAt: string;
+  indexedBy: string;
 };
 
 export type AuthSession = {

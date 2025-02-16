@@ -145,6 +145,23 @@ const migrations: Record<string, Migration> = {
         .execute();
     },
   },
+
+  "008": {
+    async up(db: Kysely<DatabaseSchema>) {
+      await db.schema
+        .alterTable("proposals")
+        .addColumn("indexedBy", "varchar")
+        .execute();
+      await db.schema
+        .alterTable("proposal_votes")
+        .addColumn("indexedBy", "varchar")
+        .execute();
+      await db.schema
+        .alterTable("user_votes")
+        .addColumn("indexedBy", "varchar")
+        .execute();
+    },
+  },
 };
 
 // APIs

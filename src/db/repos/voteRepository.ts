@@ -81,6 +81,7 @@ export class VoteRepository {
         subject: labelUri,
         createdAt,
         indexedAt: new Date().toISOString(),
+        indexedBy: "voteRepository.saveUserVote",
       })
       .execute();
   }
@@ -99,6 +100,7 @@ export class VoteRepository {
         val: vote,
         createdAt,
         indexedAt: new Date().toISOString(),
+        indexedBy: "voteRepository.saveLabelVote",
       })
       .execute();
   }

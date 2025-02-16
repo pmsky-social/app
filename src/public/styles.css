@@ -127,6 +127,7 @@ button.secondary:hover {
 
 #header p {
   font-style: italic;
+  margin-left: .3em;
 }
 
 #header a {
@@ -200,6 +201,7 @@ header .logout {
   border-radius: 25%;
   padding: .5em;
   width: 2.5em;
+  margin-top: -22px;
 }
 
 a .card {

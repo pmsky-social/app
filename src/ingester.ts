@@ -161,6 +161,7 @@ async function saveVote(
       subject: record.uri,
       createdAt: record.cts,
       indexedAt: now.toISOString(),
+      indexedBy: "ingester.saveVote",
     })
     .onConflict((oc) =>
       oc.column("uri").doUpdateSet({

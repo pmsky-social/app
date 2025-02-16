@@ -41,7 +41,8 @@ export class AllowedUsersRepository {
           "Whitelist?",
           did,
           new Date().toISOString(),
-          new Date().toISOString()
+          new Date().toISOString(),
+          "allowedUsersRepository.proposeAllowUser"
         )
       )
       .execute();

@@ -56,6 +56,7 @@ export class Backfiller {
         subject: val.uri as string,
         createdAt: val.cts,
         indexedAt: new Date().toISOString(),
+        indexedBy: "backfiller.fetchLabelVotes",
       };
     });
   }
