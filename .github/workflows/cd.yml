@@ -17,6 +17,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
       - name: Install Dependencies
         run: npm ci
       - name: Build
@@ -33,9 +34,7 @@ jobs:
         run: | 
             curl -sSf https://radicle.xyz/install | sh
             export PATH=$HOME/.radicle/bin:$PATH
-
-      - name: Authenticate with Radicle
-        run: rad auth
+            rad auth
 
       - name: Configure Git Remote for Radicle
         run: |
