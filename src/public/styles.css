@@ -61,6 +61,14 @@ select {
   font: inherit;
 }
 
+select {
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  appearance: none;
+  border: solid 1px var(--gray-fa);
+
+}
+
 p,
 h1,
 h2,
