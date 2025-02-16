@@ -1,9 +1,8 @@
-import { html, page } from "#/lib/view";
+import { page } from "#/lib/view";
 import { embeddedPost } from "#/views/components/postEmbed";
 import { AppContext } from "..";
 import { ContextualHandler } from "./ContextualHandler";
 
-// todo: cache post embed
 export class PostEmbeddedPost extends ContextualHandler {
   constructor(ctx: AppContext) {
     super(ctx, async (req, res) => {

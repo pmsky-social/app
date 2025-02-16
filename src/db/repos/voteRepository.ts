@@ -18,8 +18,8 @@ export class VoteRepository {
     );
   }
 
-  async getLabelScore(uri: string): Promise<number> {
-    this.logger.trace(uri, `getting score for label: ${uri}`);
+  async getProposalScore(uri: string): Promise<number> {
+    this.logger.trace(uri, `getting score for proposal: ${uri}`);
     const votes = await this.db
       .selectFrom("proposal_votes")
       .select("val")
@@ -35,15 +35,23 @@ export class VoteRepository {
       .selectFrom("proposal_votes")
       .select(["subject", "val"])
       .where("subject", "in", uris)
-      .execute();
+      .execute()
+      .then((row) =>
+        row.map((v) => ({ subject: v.subject, val: Number(v.val) }))
+      );
+
     const scores: { [uri: string]: number } = {};
     votes.forEach((vote) => {
+      if ((vote.val as number) != 1 && vote.val != -1) {
+        this.logger.error(vote, "unexpected vote value");
+      }
       if (scores[vote.subject]) {
         scores[vote.subject] += vote.val;
       } else {
         scores[vote.subject] = vote.val;
       }
     });
+    this.logger.trace(scores, "got scores");
     return scores;
   }
 

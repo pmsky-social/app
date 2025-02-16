@@ -4,7 +4,7 @@ import type { AppContext } from "#/index";
 import type { ContextualHandler } from "./ContextualHandler";
 import { GetHomePage } from "./home";
 import { GetCreate } from "./proposals";
-import { GetLabel, PostLabel as PostProposal } from "./labels";
+import { GetProposal, PostProposal as PostProposal } from "./labels";
 import { GetLogin, PostLogin, PostLogout } from "./login";
 import { GetClientMetadata, GetOauthCallback } from "./oauth";
 import { PostVote } from "./vote";
@@ -41,7 +41,7 @@ export const createRouter = (ctx: AppContext) => {
   router.post("/login", handler(new PostLogin(ctx)));
   router.post("/logout", handler(new PostLogout(ctx)));
   router.get("/proposals/create", handler(new GetCreate(ctx)));
-  router.get("/label/:rkey", handler(new GetLabel(ctx)));
+  router.get("/proposal/:rkey", handler(new GetProposal(ctx)));
   router.post("/proposal", handler(new PostProposal(ctx)));
   router.post("/vote", handler(new PostVote(ctx)));
   router.get("/", handler(new GetHomePage(ctx)));

@@ -1,66 +1,79 @@
-import { labelCard } from "#/views/components/labelCard";
+import { proposalCard } from "#/views/components/labelCard";
 import { getCachedPostEmbed } from "#/views/components/postEmbed";
-import { Database } from "#/db/migrations";
 import { Hole, html } from "#/lib/view";
 import { shell } from "./shell";
-import { Proposal } from "#/db/types";
+import { Proposal, ProposalType } from "#/db/types";
 import { AppContext } from "#/index";
+import pino from "pino";
 
-export type HomepageLabel = {
+export type FeedProposal = {
+  rkey: string;
   uri: string;
   val: string;
+  type: ProposalType;
   subject: string;
   voted: boolean;
   score: number;
-  embed: Hole;
+  embed: Hole | undefined; // only on post labels
+  handle: string | undefined; // only on users
   createdAt: string;
   indexedAt: string;
 };
 
-export async function homepageLabelFromDB(
-  l: Proposal,
+export async function feedProposalFromDB(
+  p: Proposal,
   embed: string | undefined,
   alreadyVoted: { subject: string }[],
   scores: { [uri: string]: number },
   ctx: AppContext
-): Promise<HomepageLabel> {
+): Promise<FeedProposal> {
   return {
-    uri: l.uri(),
-    val: l.val,
-    subject: l.subject,
-    voted: alreadyVoted.some((v) => v.subject === l.uri()),
+    rkey: p.rkey,
+    uri: p.uri(),
+    val: p.val,
+    type: p.type,
+    subject: p.subject,
+    voted: alreadyVoted.some((v) => v.subject === p.uri()),
     embed: embed
       ? // @ts-ignore
         html([embed])
-      : await getCachedPostEmbed(ctx, l.subject),
-    score: scores[l.uri()] || 0,
-    createdAt: l.createdAt,
-    indexedAt: l.indexedAt,
+      : p.type === ProposalType.POST_LABEL
+        ? await getCachedPostEmbed(ctx, p.subject)
+        : undefined,
+    score: scores[p.uri()] || 0,
+    handle:
+      p.type === ProposalType.ALLOWED_USER
+        ? await ctx.resolver.resolveDidToHandle(p.subject)
+        : undefined,
+    createdAt: p.createdAt,
+    indexedAt: p.indexedAt,
   };
 }
 
 type Props = {
-  labels: HomepageLabel[];
+  proposals: FeedProposal[];
   // didHandleMap: Record<string, string>;
   profile: { displayName?: string };
+  isMeta: boolean; // is the meta feed or not
 };
 
 export function home(props: Props) {
   return shell({
     path: [],
     title: "Home",
-    header: "PMsky",
+    header: "pmsky",
     subheader: "Participate in the moderation of the atmosphere.",
     content: content(props),
   });
 }
 
-function content({ labels, profile }: Props) {
+function content({ proposals, profile, isMeta }: Props) {
   return html`
     <div class="container">
       <div>${logout(profile)}</div>
       <div>${createProposalLink()}</div>
-      <div>${feed(labels)}</div>
+      <div>${metaLink(isMeta)}</div>
+      <div>${feed(proposals)}</div>
     </div>
   `;
 }
@@ -71,6 +84,13 @@ function createProposalLink() {
       ><button title="Create a new label">Create</button></a
     >
   </p>`;
+}
+
+function metaLink(curr: boolean) {
+  const url = curr ? "/" : "/?meta=true";
+  const title = curr ? "View proposals" : "View meta proposals";
+  const label = curr ? "Main" : "Meta";
+  return html`<a href="${url}"><button title="${title}">${label}</button></a>`;
 }
 
 function toBskyLink(did: string) {
@@ -88,13 +108,16 @@ function logout(profile: { displayName?: string }) {
   `;
 }
 
-function feed(labels: HomepageLabel[]) {
+function feed(proposals: FeedProposal[]) {
+  const logger = pino({ name: "feedview" });
+  logger.trace(proposals, "constructing feed for proposals");
   // returns a list of labels to vote on
+  // TODO: add pagination, filters
   return html`
-    <p>Here's a list of posts to vote on:</p>
-    ${labels.map((label) => {
-      const href = `/label/${label.uri}`;
-      return html`<a href="${href}">${labelCard(label)}</a>`;
+    <p>Here's a list of proposals to vote on:</p>
+    ${proposals.map((proposal) => {
+      const href = `/proposal/${proposal.rkey}`;
+      return html`<a href="${href}">${proposalCard(proposal)}</a>`;
     })}
   `;
 }

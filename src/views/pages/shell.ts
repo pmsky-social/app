@@ -3,14 +3,12 @@ import { type Hole, html } from "#/lib/view";
 export function shell({
   path,
   title,
-  header,
   subheader,
   msg,
   content,
 }: {
   path: string[];
   title: string;
-  header: string;
   subheader: string | Hole;
   msg?: string | Hole;
   content: Hole;
@@ -24,6 +22,10 @@ export function shell({
   return html`<html>
     <head>
       <title>${title}</title>
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@exampledev/new.css@1.1.2/new.min.css"
+      />
       <link rel="stylesheet" href="/public/styles.css" />
       <script src="https://unpkg.com/htmx.org@2.0.4"></script>
       <script
@@ -33,14 +35,16 @@ export function shell({
     </head>
     <body>
       <div class="${errorClass}">${msg}</div>
-      <div id="header">
-        <h1><a href="/">${header}</a></h1>
+      <header id="header">
+        <h1>
+          <a href="/"><span class="pm">pm</span><span class="sky">sky</span></a>
+        </h1>
+        <p>${subheader}</p>
         <div id="nav">
           ${hasPrev ? html`<a href="${prevDest}">Back</a>` : ""}
         </div>
-        <p>${subheader}</p>
-      </div>
-      <div id="content">${content}</div>
+      </header>
+      <main id="content">${content}</main>
     </body>
   </html>`;
 }

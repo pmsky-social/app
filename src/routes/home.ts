@@ -1,13 +1,13 @@
 import type { Agent } from "@atproto/api";
 import * as Profile from "#/lexicon/types/app/bsky/actor/profile";
 import { page } from "#/lib/view";
-import { HomepageLabel, homepageLabelFromDB } from "#/views/pages/home";
+import { FeedProposal, feedProposalFromDB } from "#/views/pages/home";
 import { home } from "#/views/pages/home";
 import type { AppContext } from "..";
 import { ContextualHandler } from "./ContextualHandler";
 import { getSessionAgent } from "./util";
 import { VoteRepository } from "#/db/repos/voteRepository";
-import { Proposal } from "#/db/types";
+import { Proposal, ProposalType } from "#/db/types";
 
 export class GetHomePage extends ContextualHandler {
   constructor(ctx: AppContext) {
@@ -19,7 +19,10 @@ export class GetHomePage extends ContextualHandler {
       ctx.logger.trace("got agent");
 
       // Fetch data stored in our SQLite
-      const labels: HomepageLabel[] = await this.getLabels(agent);
+      const isMeta = req.query.meta === "true";
+      ctx.logger.trace(isMeta, "isMeta");
+      const type = isMeta ? ProposalType.ALLOWED_USER : ProposalType.POST_LABEL;
+      const proposals: FeedProposal[] = await this.getProposals(agent, type);
 
       // Map user DIDs to their domain-name handles
       // get dids for posts with labels
@@ -44,32 +47,37 @@ export class GetHomePage extends ContextualHandler {
       return res.type("html").send(
         page(
           home({
-            labels,
+            proposals,
             // didHandleMap,
             profile,
+            isMeta,
           })
         )
       );
     });
   }
 
-  async getLabels(agent: Agent): Promise<HomepageLabel[]> {
-    const labels = await this.ctx.db
+  async getProposals(
+    agent: Agent,
+    proposalType: ProposalType = ProposalType.POST_LABEL
+  ): Promise<FeedProposal[]> {
+    const proposals = await this.ctx.db
       .selectFrom("proposals")
       .selectAll()
+      .where("type", "=", proposalType)
       .orderBy("indexedAt", "desc")
       .limit(10)
       .execute()
       .then((rows) => rows.map((r) => Proposal.fromDB(r)));
 
-    const labelUris = labels.map(
+    const uris = proposals.map(
       (l) => `at://${l.src}/social.pmsky.label/${l.rkey}`
     );
 
     const embeds = await this.ctx.db
       .selectFrom("posts")
       .selectAll()
-      .where("uri", "in", labelUris)
+      .where("uri", "in", uris)
       .execute()
       .then((rows) =>
         rows.reduce(
@@ -81,12 +89,12 @@ export class GetHomePage extends ContextualHandler {
         )
       );
 
-    this.ctx.logger.trace(labelUris, "fetched labels for route /home");
+    this.ctx.logger.trace(uris, "fetched proposals for route /home");
     const alreadyVoted = await this.ctx.db
       .selectFrom("user_votes")
       .select("subject")
       .where("src", "=", agent.assertDid)
-      .where("subject", "in", labelUris)
+      .where("subject", "in", uris)
       .execute();
 
     // this.ctx.logger.trace(
@@ -97,13 +105,13 @@ export class GetHomePage extends ContextualHandler {
     const scores = await new VoteRepository(
       this.ctx.db,
       this.ctx.logger
-    ).getLabelScores(labelUris);
+    ).getLabelScores(uris);
 
     // this.ctx.logger.trace(scores, "fetched scores for labels");
     return await Promise.all(
-      labels.map(
+      proposals.map(
         async (l) =>
-          await homepageLabelFromDB(
+          await feedProposalFromDB(
             l,
             embeds[l.subject],
             alreadyVoted,

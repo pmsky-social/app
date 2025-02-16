@@ -16,8 +16,8 @@ import {
   BadRequest,
   InvalidRecord,
   InvalidVote,
-  LabelExists,
-  LabelNotFound,
+  ProposalExists,
+  ProposalNotFound as ProposalNotFound,
 } from "./error";
 import {
   validateRecord as validateLabel,
@@ -124,7 +124,7 @@ export class AtprotoServiceAccount {
   async publishLabel(label: string, subject: string) {
     const existing = await this.getLabelUri(label, subject);
     if (existing !== undefined) {
-      throw new LabelExists(existing);
+      throw new ProposalExists(existing);
     }
     // Construct & validate label record
     const rkey = TID.nextStr();
@@ -191,20 +191,21 @@ export class AtprotoServiceAccount {
     return uri;
   }
 
-  private async labelExists({
-    labelUri,
+  // todo: why is this on the svc acct?
+  private async proposalExists({
+    proposalUri,
     labelValue,
     subject,
   }: {
-    labelUri?: string;
+    proposalUri?: string;
     labelValue?: string;
     subject?: string;
   }): Promise<boolean> {
     let query = this.db.selectFrom("proposals").select("rkey");
 
-    if (labelUri) {
-      const rkey = labelUri.split("/").pop();
-      const src = labelUri.split("/")[2];
+    if (proposalUri) {
+      const rkey = proposalUri.split("/").pop();
+      const src = proposalUri.split("/")[2];
       if (rkey === undefined) {
         throw new BadRequest("missing rkey");
       }
@@ -234,13 +235,13 @@ export class AtprotoServiceAccount {
     );
   }
 
-  async publishVote(vote: 1 | -1, labelUri: string, userDid: string) {
-    this.logger.trace({ vote, labelUri, userDid }, "svc act publish vote");
+  async publishVote(vote: 1 | -1, proposalUri: string, userDid: string) {
+    this.logger.trace({ vote, proposalUri, userDid }, "svc act publish vote");
     // check that labelUri exists in DB, if not throw error
-    if (!(await this.labelExists({ labelUri })))
-      throw new LabelNotFound(labelUri);
-    if (await this.userVotedAlready(userDid, labelUri))
-      throw new AlreadyVoted(labelUri);
+    if (!(await this.proposalExists({ proposalUri })))
+      throw new ProposalNotFound(proposalUri);
+    if (await this.userVotedAlready(userDid, proposalUri))
+      throw new AlreadyVoted(proposalUri);
     if (vote !== 1 && vote !== -1) throw new InvalidVote(vote);
 
     // TODO: move this to a constant somewhere
@@ -249,7 +250,7 @@ export class AtprotoServiceAccount {
     const record: VoteRecord = {
       $type: recordType,
       src: this.did(),
-      uri: labelUri,
+      uri: proposalUri,
       val: vote,
       cts: new Date().toISOString(),
     };
@@ -258,7 +259,7 @@ export class AtprotoServiceAccount {
     try {
       await new VoteRepository(this.db, this.logger).saveVote(
         userDid,
-        labelUri,
+        proposalUri,
         vote,
         voteRecordUri,
         record.cts
@@ -279,5 +280,9 @@ export class AtprotoServiceAccount {
     });
     // this.logger.trace({ records }, "got response");
     return records.data.records;
+  }
+
+  async resolveHandle(handle: string) {
+    return await this.agent.resolveHandle({ handle }).then((r) => r.data.did);
   }
 }

@@ -22,7 +22,7 @@ export const ALL_PROPOSAL_TYPES = [
 export class Proposal {
   rkey!: string; // primary key
   src!: string; // who created the label (always the service act did)
-  type!: ProposalType;
+  type!: ProposalType; // label or allowed_user
   val!: string; // the label itself
   subject!: string; // the URI of the resource this label applies to
   createdAt!: string;
@@ -75,7 +75,7 @@ export type UserVote = {
 export type ProposalVote = {
   uri: string; // URI of the vote
   val: 1 | -1; // vote direction
-  subject: string; // URI of the label voted on
+  subject: string; // URI of the proposal voted on
   createdAt: string;
   indexedAt: string;
 };

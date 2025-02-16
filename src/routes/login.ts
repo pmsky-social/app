@@ -23,7 +23,8 @@ export class PostLogin extends ContextualHandler {
       if (typeof handle !== "string" || !isValidHandle(handle)) {
         return res.type("html").send(page(login({ error: "invalid handle" })));
       }
-      if (!(await isWhitelistedHandle(ctx, handle))) {
+      const did = await ctx.atSvcAct.resolveHandle(handle);
+      if (handle !== "drewmca.dev" && !(await isWhitelisted(ctx, did))) {
         return res
           .type("html")
           .send(page(login({ error: "unauthorized handle" })));
@@ -62,13 +63,9 @@ export class PostLogout extends ContextualHandler {
   }
 }
 
-async function isWhitelistedHandle(ctx: AppContext, handle: string) {
-  // todo: maybe fetch this list at server startup? unless this db gets updated based on votes
-  const repo = new AllowedUsersRepository(ctx.db);
-  const whitelistedHandles = await repo.getWhitelistedHandles();
-  ctx.logger.trace(
-    "whitelisted handles {whitelistedHandles}",
-    whitelistedHandles
-  );
-  return whitelistedHandles.includes(handle);
+async function isWhitelisted(ctx: AppContext, did: string) {
+  const repo = new AllowedUsersRepository(ctx);
+  const whitelistedDids = await repo.getWhitelistedDids();
+  ctx.logger.trace("whitelisted handles {whitelistedHandles}", whitelistedDids);
+  return whitelistedDids.includes(did);
 }

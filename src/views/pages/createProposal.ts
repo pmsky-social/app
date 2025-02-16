@@ -86,7 +86,7 @@ function ProposePostLabelComponents(allowedLabelValues: string[]) {
       </div>
 
       <input type="hidden" name="oembedHtml" id="oembedHtml" />
-      <select type="text" name="label" placeholder="Choose a label" required>
+      <select type="text" name="label" placeholder="Choose a label">
         <option value="">Select a label</option>
         ${allowedLabelValues.map(labelValueOption)}
       </select>

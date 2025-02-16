@@ -6,7 +6,7 @@ import {
   Migrator,
   SqliteDialect,
 } from "kysely";
-import { DatabaseSchema } from "./types";
+import { DatabaseSchema, ProposalType } from "./types";
 
 const migrationProvider: MigrationProvider = {
   async getMigrations() {
@@ -134,6 +134,15 @@ const migrations: Record<string, Migration> = {
         .execute();
 
       await db.schema.alterTable("proposals").dropColumn("embed").execute();
+    },
+  },
+  "007": {
+    async up(db: Kysely<DatabaseSchema>) {
+      await db
+        .updateTable("proposals")
+        .where("type", "is", null)
+        .set("type", ProposalType.POST_LABEL)
+        .execute();
     },
   },
 };

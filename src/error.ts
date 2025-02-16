@@ -4,17 +4,17 @@ export class InvalidRecord extends Error {
   }
 }
 
-export class LabelNotFound extends Error {
-  constructor(labelUri: string) {
-    super(`URI not found in Labels table: ${labelUri}`);
+export class ProposalNotFound extends Error {
+  constructor(proposalUri: string) {
+    super(`URI not found in Proposals table: ${proposalUri}`);
   }
 }
 
-export class LabelExists extends Error {
+export class ProposalExists extends Error {
   existingUri: string;
-  constructor(labelUri: string) {
-    super(`Label already exists. URI: ${labelUri}`);
-    this.existingUri = labelUri;
+  constructor(proposalUri: string) {
+    super(`Proposal already exists. URI: ${proposalUri}`);
+    this.existingUri = proposalUri;
   }
 }
 

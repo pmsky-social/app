@@ -1,11 +1,11 @@
 import { embeddedPost } from "#/views/components/postEmbed";
-import { LabelRepository } from "#/db/repos/labelRepository";
+import { LabelRepository as ProposalRepository } from "#/db/repos/labelRepository";
 import { VoteRepository } from "#/db/repos/voteRepository";
-import { InvalidRecord, LabelExists } from "#/error";
+import { InvalidRecord, ProposalExists } from "#/error";
 import { page } from "#/lib/view";
-import { Label } from "#/views/pages/Label";
+import { Proposal } from "#/views/pages/Label";
 import { createProposal } from "#/views/pages/createProposal";
-import { HomepageLabel } from "#/views/pages/home";
+import { FeedProposal as FeedProposal } from "#/views/pages/home";
 import type { AppContext } from "..";
 import { ContextualHandler } from "./ContextualHandler";
 import { getSessionAgent } from "./util";
@@ -13,45 +13,58 @@ import { ALLOWED_LABEL_VALUES } from "./proposals";
 import { ALL_PROPOSAL_TYPES, ProposalType } from "#/db/types";
 import { Agent } from "@atproto/api";
 import type express from "express";
+import { AllowedUsersRepository } from "#/db/repos/allowedUsersRepository";
+import { isValidHandle } from "@atproto/syntax";
 
-export class GetLabel extends ContextualHandler {
+export class GetProposal extends ContextualHandler {
   constructor(ctx: AppContext) {
     super(ctx, async (req, res) => {
-      ctx.logger.trace(req.params, "got request to GET /label/:uri");
+      ctx.logger.trace(req.params, "got request to GET /proposal/:rkey");
       ctx.logger.trace(req.query, "req.query");
       const alreadyExisted = req.query.error === "exists";
       ctx.logger.trace(alreadyExisted, "already exists?");
       const agent = await getSessionAgent(req, res, ctx);
       if (!agent || !agent.did) return res.sendStatus(403); // TODO: redirect, or use auth middleware
 
-      const label = await new LabelRepository(ctx.db).getLabel(req.params.rkey);
-      if (!label) return res.sendStatus(404);
+      const proposal = await new ProposalRepository(ctx.db).getProposal(
+        req.params.rkey
+      );
+      if (!proposal) return res.sendStatus(404);
 
       const votes = new VoteRepository(ctx.db, ctx.logger);
-      const labelUri = `at://${label.src}/social.pmsky.label/${label.rkey}`;
-      const voted = await votes.userVotedAlready(agent.did, labelUri);
-      const score = await votes.getLabelScore(labelUri);
+      const uri = `at://${proposal.src}/social.pmsky.label/${proposal.rkey}`;
+      const voted = await votes.userVotedAlready(agent.did, uri);
+      const score = await votes.getProposalScore(uri);
 
-      const embed = await embeddedPost(ctx, label.subject);
+      const embed =
+        proposal.type === ProposalType.POST_LABEL
+          ? await embeddedPost(ctx, proposal.subject)
+          : undefined;
 
-      const hydrated: HomepageLabel = {
-        ...label,
-        uri: labelUri,
+      const handle =
+        proposal.type === ProposalType.ALLOWED_USER
+          ? await ctx.resolver.resolveDidToHandle(proposal.subject)
+          : undefined;
+
+      const hydrated: FeedProposal = {
+        ...proposal,
+        uri,
         voted,
         score,
         embed,
+        handle,
       };
       return res
         .type("html")
-        .send(page(Label({ label: hydrated, alreadyExisted })));
+        .send(page(Proposal({ proposal: hydrated, alreadyExisted })));
     });
   }
 }
 
-export class PostLabel extends ContextualHandler {
+export class PostProposal extends ContextualHandler {
   constructor(ctx: AppContext) {
     super(ctx, async (req, res) => {
-      ctx.logger.trace(req.body, "got request to POST /label");
+      ctx.logger.trace(req.body, "got request to POST /proposal");
       const agent = await getSessionAgent(req, res, ctx);
       if (!agent) return res.sendStatus(403);
 
@@ -113,7 +126,7 @@ export class PostLabel extends ContextualHandler {
 
     try {
       const rkey = await this.ctx.atSvcAct.publishLabel(label, subject);
-      return res.redirect(`/label/${rkey}`);
+      return res.redirect(`/proposal/${rkey}`);
     } catch (e) {
       this.ctx.logger.error(e, "error publishing label");
       if (e instanceof InvalidRecord) {
@@ -123,8 +136,8 @@ export class PostLabel extends ContextualHandler {
           .send(backToPageWithErrorMsg("label failed validation"));
       }
 
-      if (e instanceof LabelExists) {
-        return res.redirect(`/label/${e.existingUri}?error=exists`);
+      if (e instanceof ProposalExists) {
+        return res.redirect(`/proposal/${e.existingUri}?error=exists`);
       }
 
       return res
@@ -140,7 +153,26 @@ export class PostLabel extends ContextualHandler {
   ) {
     const handle = req.body.handle;
 
-    // todo: continue here with handling serverside response to allow user request
+    if (!isValidHandle(handle)) {
+      return res
+        .type("html")
+        .send(backToPageWithErrorMsg(`Invalid handle: ${handle}`));
+    }
+
+    const did = await agent.resolveHandle({ handle }).then((r) => r.data.did);
+
+    const repo = new AllowedUsersRepository(this.ctx);
+    const existing = await repo.getProposalByUser(did);
+    // if handle already in proposals,
+    if (existing !== undefined) {
+      // redirect to existing proposal page (w "already exists" msg)
+      return res.redirect(`/proposal/${existing.rkey}?error=exists`);
+    }
+
+    // add handle to db
+    const rkey = await repo.proposeAllowUser(did);
+
+    return res.redirect(`/proposal/${rkey}`);
   }
 }
 
@@ -170,6 +202,7 @@ function transformToAtUri(uri: string): string {
 function backToPageWithErrorMsg(msg: string) {
   return page(
     createProposal({
+      // todo: initProposalType?
       proposalTypes: ALL_PROPOSAL_TYPES,
       allowedLabelValues: ALLOWED_LABEL_VALUES,
       error: msg,

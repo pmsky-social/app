@@ -90,10 +90,10 @@ export function createJetstreamIngester(db: Database, idResolver: IdResolver) {
       isRecord(evt.commit.record) &&
       validateRecord(evt.commit.record).success
     ) {
-      logger.trace(evt, "creating vote");
+      logger.trace(evt, "saving vote from jetstream");
       saveVote(db, evt);
     } else {
-      logger.warn(evt, "invalid vote record");
+      logger.warn(evt, "invalid vote record from jetstream");
     }
   });
 
