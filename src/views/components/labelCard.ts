@@ -39,12 +39,17 @@ function voting(label: FeedProposal) {
   return html`
     <form method="post" class="vote" action="/vote" rel="noopener">
       <input name="uri" value="${label.uri}" type="hidden" />
-      <button disabled=${label.voted} title="Agree" name="direction" value="up">
+      <button
+        ?disabled=${label.voted}
+        title="Agree"
+        name="direction"
+        value="up"
+      >
         +
       </button>
       <button disabled class="secondary score">${score}</button>
       <button
-        disabled=${label.voted}
+        ?disabled=${label.voted}
         title="Disagree"
         name="direction"
         value="down"

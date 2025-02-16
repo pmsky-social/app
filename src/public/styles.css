@@ -94,7 +94,7 @@ button.secondary {
   background-color: var(--gray-7);
 }
 
-button.secondary:hover {
+button:not([disabled]).secondary:hover {
   background-color: var(--gray-5);
 }
 
@@ -277,7 +277,9 @@ form.vote {
 button[disabled].score {
   color: var(--black);
   opacity: 1;
+  cursor: default;
 }
+
 
 .voting-form .btn {
   padding: 8px 12px;
