@@ -16,7 +16,6 @@ export function Proposal(props: Props) {
   return shell({
     path: ["proposal", props.proposal.rkey],
     title: "View Proposal",
-    subheader: "Viewing a proposal",
     msg,
     content: content(props),
   });
@@ -24,6 +23,8 @@ export function Proposal(props: Props) {
 
 function content({ proposal }: Props) {
   return html`
-    <div class="container">${feedButtons(true)} ${proposalCard(proposal)}</div>
+    <div class="container">
+      ${feedButtons("a proposal", true)} ${proposalCard(proposal)}
+    </div>
   `;
 }

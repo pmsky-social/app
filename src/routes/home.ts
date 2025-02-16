@@ -60,6 +60,7 @@ export class GetHomePage extends ContextualHandler {
     agent: Agent,
     proposalType: ProposalType = ProposalType.POST_LABEL
   ): Promise<FeedProposal[]> {
+    // todo: turn this into one big JOINed query
     const proposals = await this.ctx.db
       .selectFrom("proposals")
       .selectAll()

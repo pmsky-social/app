@@ -3,13 +3,11 @@ import { type Hole, html } from "#/lib/view";
 export function shell({
   path,
   title,
-  subheader,
   msg,
   content,
 }: {
   path: string[];
   title: string;
-  subheader: string | Hole;
   msg?: string | Hole;
   content: Hole;
 }) {
@@ -44,7 +42,10 @@ export function shell({
                 ><span class="pm">pm</span><span class="sky">sky</span></a
               >
             </h1>
-            <p>${subheader}</p>
+            <p>
+              <a href="//pmsky.social">Participatory moderation</a> in the
+              <a href="//atproto.com">atmosphere</a>.
+            </p>
           </div>
           ${logout(isLoggedIn)}
         </div>

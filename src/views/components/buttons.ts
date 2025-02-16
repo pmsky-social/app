@@ -15,10 +15,10 @@ export function metaLink(curr: boolean) {
   >`;
 }
 
-export function feedButtons(linkToMain: boolean) {
+export function feedButtons(pageName: string, linkToMain: boolean) {
   return html`<div class="row">
     ${metaLink(linkToMain)}<span class="feed-header-text"
-      >Viewing the ${!linkToMain ? "main" : "meta"} feed</span
+      >Viewing ${pageName}</span
     >${createProposalLink()}
   </div>`;
 }

@@ -61,15 +61,15 @@ export function home(props: Props) {
   return shell({
     path: [],
     title: "Home",
-    subheader: "Participate in the moderation of the atmosphere.",
     content: content(props),
   });
 }
 
 function content({ proposals, isMeta }: Props) {
+  const pageName = isMeta ? "meta proposals" : "proposals";
   return html`
     <div class="container">
-      ${feedButtons(isMeta)}
+      ${feedButtons(pageName, isMeta)}
       <div class="feed">${feed(proposals)}</div>
     </div>
   `;

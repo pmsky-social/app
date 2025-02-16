@@ -155,7 +155,7 @@ button:not([disabled]).secondary:hover {
 }
 
 #header a:hover span.sky {
-  color: var(--gray-5)
+  color: var(--gray-4)
 }
 
 #header h1 {
