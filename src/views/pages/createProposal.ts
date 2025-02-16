@@ -139,6 +139,9 @@ function ProposeAllowedUserComponents() {
       type="text"
       name="handle"
       placeholder="Enter a handle"
+      autocomplete="off"
+      spellcheck="false"
+      autocorrect="off"
     />
   </div>`;
 }
