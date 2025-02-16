@@ -1,38 +1,28 @@
 import { FeedProposal } from "#/views/pages/home";
 import { html } from "#/lib/view";
 import { ProposalType } from "#/db/types";
-import pino from "pino";
 
 export function proposalCard(proposal: FeedProposal) {
-  if (proposal.type == ProposalType.POST_LABEL) {
-    return html`
-      <div class="card">
+  const href = `/proposal/${proposal.rkey}`;
+  const includeEmbed =
+    proposal.type == ProposalType.POST_LABEL && proposal.embed;
+  const title =
+    proposal.type == ProposalType.POST_LABEL ? proposal.val : proposal.handle;
+  return html`
+    <div class="card">
+      <a href="${href}">
         <div class="card-header">
-          <p class="proposal-value">${proposal.val}</p>
+          <p class="proposal-value">${title}</p>
           <p class="proposal-subject">${proposal.subject}</p>
         </div>
-        ${proposal.embed}
-        <p>${ts(proposal)}</p>
-        <p>${score(proposal)}</p>
-        <p>${voting(proposal)}</p>
-      </div>
-    `;
-  }
-  if (proposal.type == ProposalType.ALLOWED_USER) {
-    return html`
-      <div class="card">
-        <div class="card-header">
-          <p class="proposal-value">@${proposal.handle}</p>
-          <p class="proposal-subject">${proposal.subject}</p>
-        </div>
+      </a>
+      ${(includeEmbed && proposal.embed) || ""}
+      <a href="${href}">
         <p class="proposal-timestamp">${ts(proposal)}</p>
-        <p class="proposal-score">${score(proposal)}</p>
         <p class="proposal-voting">${voting(proposal)}</p>
-      </div>
-    `;
-  }
-  const logger = pino({ name: "proposalCard" });
-  logger.error("unknown proposal type", proposal);
+      </a>
+    </div>
+  `;
 }
 
 function ts(label: FeedProposal) {
@@ -42,18 +32,23 @@ function ts(label: FeedProposal) {
   return indexedAt.toDateString();
 }
 
-function score(label: FeedProposal) {
-  const score = Math.floor(label.score);
-  return html`<div class="score">${score}</div>`;
-}
-
 function voting(label: FeedProposal) {
-  if (label.voted) return html`Thanks for voting!`;
+  const score = Math.floor(label.score);
   return html`
-    <form method="post" class="upvote" action="/vote" rel="noopener">
+    <form method="post" class="vote" action="/vote" rel="noopener">
       <input name="uri" value="${label.uri}" type="hidden" />
-      <button name="direction" value="up">upvote</button>
-      <button name="direction" value="down">downvote</button>
+      <button disabled=${label.voted} title="Agree" name="direction" value="up">
+        +
+      </button>
+      <button disabled class="secondary score">${score}</button>
+      <button
+        disabled=${label.voted}
+        title="Disagree"
+        name="direction"
+        value="down"
+      >
+        -
+      </button>
     </form>
   `;
 }

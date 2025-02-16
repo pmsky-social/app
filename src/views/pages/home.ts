@@ -53,7 +53,7 @@ export async function feedProposalFromDB(
 type Props = {
   proposals: FeedProposal[];
   // didHandleMap: Record<string, string>;
-  profile: { displayName?: string };
+  // profile: { displayName?: string };
   isMeta: boolean; // is the meta feed or not
 };
 
@@ -61,29 +61,24 @@ export function home(props: Props) {
   return shell({
     path: [],
     title: "Home",
-    header: "pmsky",
     subheader: "Participate in the moderation of the atmosphere.",
     content: content(props),
   });
 }
 
-function content({ proposals, profile, isMeta }: Props) {
+function content({ proposals, isMeta }: Props) {
   return html`
     <div class="container">
-      <div>${logout(profile)}</div>
-      <div>${createProposalLink()}</div>
-      <div>${metaLink(isMeta)}</div>
+      <div class="row">${createProposalLink()} ${metaLink(isMeta)}</div>
       <div>${feed(proposals)}</div>
     </div>
   `;
 }
 
 function createProposalLink() {
-  return html`<p>
-    <a href="/proposals/create"
-      ><button title="Create a new label">Create</button></a
-    >
-  </p>`;
+  return html`<a href="/proposals/create"
+    ><button title="Create a new label">Create</button></a
+  >`;
 }
 
 function metaLink(curr: boolean) {
@@ -97,27 +92,8 @@ function toBskyLink(did: string) {
   return `https://bsky.app/profile/${did}`;
 }
 
-function logout(profile: { displayName?: string }) {
-  return html`
-    <form action="/logout" method="post" class="session-form">
-      <div>Welcome, <strong>${profile.displayName || "friend"}</strong>.</div>
-      <div>
-        <button type="submit">Log out</button>
-      </div>
-    </form>
-  `;
-}
-
 function feed(proposals: FeedProposal[]) {
-  const logger = pino({ name: "feedview" });
-  logger.trace(proposals, "constructing feed for proposals");
   // returns a list of labels to vote on
   // TODO: add pagination, filters
-  return html`
-    <p>Here's a list of proposals to vote on:</p>
-    ${proposals.map((proposal) => {
-      const href = `/proposal/${proposal.rkey}`;
-      return html`<a href="${href}">${proposalCard(proposal)}</a>`;
-    })}
-  `;
+  return html`${proposals.map(proposalCard)}`;
 }

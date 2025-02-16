@@ -12,7 +12,6 @@ export function createProposal(props: Props) {
   return shell({
     path: ["createProposal"],
     title: "Create Proposal",
-    header: "PMsky",
     subheader: html`Welcome to
       <a href="//pmsky.social"><em>AfternoonSky</em></a>`,
     content: content(props),

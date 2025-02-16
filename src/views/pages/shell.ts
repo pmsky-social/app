@@ -36,10 +36,17 @@ export function shell({
     <body>
       <div class="${errorClass}">${msg}</div>
       <header id="header">
-        <h1>
-          <a href="/"><span class="pm">pm</span><span class="sky">sky</span></a>
-        </h1>
-        <p>${subheader}</p>
+        <div class="row">
+          <div class="col">
+            <h1>
+              <a href="/"
+                ><span class="pm">pm</span><span class="sky">sky</span></a
+              >
+            </h1>
+            <p>${subheader}</p>
+          </div>
+          ${logout()}
+        </div>
         <div id="nav">
           ${hasPrev ? html`<a href="${prevDest}">Back</a>` : ""}
         </div>
@@ -47,4 +54,10 @@ export function shell({
       <main id="content">${content}</main>
     </body>
   </html>`;
+}
+
+function logout() {
+  return html`<button title="Log out" class="logout" hx-post="/logout">
+    ✖
+  </button>`;
 }

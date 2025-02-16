@@ -48,8 +48,6 @@ export class GetHomePage extends ContextualHandler {
         page(
           home({
             proposals,
-            // didHandleMap,
-            profile,
             isMeta,
           })
         )

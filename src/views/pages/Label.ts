@@ -15,7 +15,6 @@ export function Proposal(props: Props) {
   return shell({
     path: ["proposal", props.proposal.rkey],
     title: "View Proposal",
-    header: "PMsky",
     subheader: "Viewing a proposal",
     msg,
     content: content(props),

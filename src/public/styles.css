@@ -186,6 +186,24 @@ form {
   margin-top: 1rem;
 }
 
+.row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+}
+
+header .logout {
+  border-radius: 25%;
+  padding: .5em;
+  width: 2.5em;
+}
+
 a .card {
   color: var(--gray-7);
   /* text-decoration: none; */
@@ -206,6 +224,10 @@ a .card {
 
 .card a {
   text-decoration: none;
+}
+
+.card a * {
+  color: var(--gray-3)
 }
 
 /* Header Styles */
@@ -246,9 +268,15 @@ a .card {
 }
 
 /* Voting Buttons */
-.card-actions {
+form.vote {
   display: flex;
   gap: 10px;
+  justify-content: start;
+}
+
+button[disabled].score {
+  color: var(--black);
+  opacity: 1;
 }
 
 .voting-form .btn {
