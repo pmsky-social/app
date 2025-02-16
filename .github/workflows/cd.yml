@@ -30,7 +30,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install Radicle CLI (example)
-        run: curl -sSf https://radicle.xyz/install | sh
+        run: | 
+            curl -sSf https://radicle.xyz/install | sh
+            export PATH=$HOME/.radicle/bin:$PATH
 
       - name: Authenticate with Radicle
         run: rad auth
