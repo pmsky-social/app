@@ -10,6 +10,7 @@
   --card-background-color: #fff;
   --border-color: #ddd;
   --gray-fa: #fafafa;
+  --gray-d9: #d9d9d9;
   --gray-9: #999;
   --gray-7: #777;
   --gray-6: #666;
@@ -36,6 +37,7 @@
     --card-background-color: #111;
     --border-color: #666;
     --gray-fa: #333;
+    --gray-d9: #444;
     --gray-9: #555;
     --gray-7: #666;
     --gray-6: #777;
@@ -214,6 +216,7 @@ form {
 .login-form input {
   flex: 1;
   border: 0;
+  margin-bottom: 0;
 }
 
 .signup-cta {
@@ -310,12 +313,16 @@ form.vote {
   justify-content: start;
 }
 
-button[disabled].score {
+form.vote button {
   color: var(--black);
-  opacity: 1;
-  cursor: default;
 }
 
+/* todo, shouldn't be a button really */
+button[disabled].score {
+  opacity: 1;
+  cursor: default;
+  background-color: var(--gray-d9);
+}
 
 .voting-form .btn {
   padding: 8px 12px;

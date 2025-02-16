@@ -19,7 +19,7 @@ import {
 } from "#/lexicon/types/social/pmsky/vote";
 import { env } from "./lib/env";
 import { SOCIAL_PMSKY_LABEL, SOCIAL_PMSKY_VOTE } from "./constants";
-import { Proposal, ProposalType } from "./db/types";
+import { Proposal, ProposalVoteUri, ProposalType } from "./db/types";
 
 const ALL_SOCIAL_PMSKY_RECORDS = "social.pmsky.*";
 const DESIRED_COLLECTIONS = [
@@ -156,7 +156,7 @@ async function saveVote(
   await db
     .insertInto("proposal_votes")
     .values({
-      uri: evt.commit.rkey.toString(), // is this right?
+      uri: ProposalVoteUri(record.src, evt.commit.rkey.toString()),
       val: record.val,
       subject: record.uri,
       createdAt: record.cts,

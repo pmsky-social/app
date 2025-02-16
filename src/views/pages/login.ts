@@ -11,6 +11,7 @@ export function login(props: Props) {
   });
 }
 
+// todo: link to docs on requesting access if error == "unauthorized handle"
 function content({ error }: Props) {
   return html`<div id="root">
     <div class="container">

@@ -95,6 +95,10 @@ export type ProposalVote = {
   indexedBy: string;
 };
 
+export function ProposalVoteUri(src: string, rkey: string) {
+  return `at://${src}/social.pmsky.vote/${rkey}`;
+}
+
 export type AuthSession = {
   key: string;
   session: AuthSessionJson;
