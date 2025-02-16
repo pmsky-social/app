@@ -24,7 +24,8 @@ export class VoteRepository {
       .selectFrom("proposal_votes")
       .select("val")
       .where("subject", "=", uri)
-      .execute();
+      .execute()
+      .then((rows) => rows.map(({ val }) => ({ val: Number(val) })));
     const score = votes.reduce((acc, vote) => acc + vote.val, 0);
     this.logger.trace(`score: ${score}`);
     return score;

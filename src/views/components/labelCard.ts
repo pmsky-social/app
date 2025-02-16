@@ -7,7 +7,9 @@ export function proposalCard(proposal: FeedProposal) {
   const includeEmbed =
     proposal.type == ProposalType.POST_LABEL && proposal.embed;
   const title =
-    proposal.type == ProposalType.POST_LABEL ? proposal.val : proposal.handle;
+    proposal.type == ProposalType.POST_LABEL
+      ? proposal.val
+      : `@${proposal.handle}`;
   return html`
     <div class="card">
       <a href="${href}">
