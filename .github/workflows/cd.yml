@@ -1,11 +1,13 @@
 # the VM hosting the deployed app only has IPv6, which github does not support
-# so our CD pushes to a radicle mirror of the repository, and hits a webhook on the VM
+# so our CD pushes to a GitLab mirror of the repository, and hits a webhook on the VM
 
-name: Radicle Mirror
+name: GitLab Mirror
 
 on:
-  push:
-    branches: [ main ]
+    workflow_dispatch:
+# not yet working
+#   push:
+    # branches: [ main ]
 
 jobs:
   build:
@@ -30,18 +32,12 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Install Radicle CLI (example)
-        run: | 
-            curl -sSf https://radicle.xyz/install | sh
-            export PATH=$HOME/.radicle/bin:$PATH
-            rad auth
-
-      - name: Configure Git Remote for Radicle
+      - name: Configure Git for GitLab
         run: |
-          # Add a new remote named "rad" for your Radicle project.
-          # Replace the URL below with your project's actual radicle URL.
-          git remote add rad "rad://rad:z2swoV1DQeLYhiC6cAKmMHHEpWKvQ" || true
-          git remote set-url rad "rad://rad:z2swoV1DQeLYhiC6cAKmMHHEpWKvQ"
+            git config --global user.email "git@pmsky.social"
+            git config --global user.name "PMsky's GitHub Actions Runner"
+            # Add the GitLab remote; replace with your GitLab repo URL
+            git remote add gitlab https://oauth2:${{ secrets.GITLAB_TOKEN }}@gitlab.com/afternoonsky/app.git || true
 
-      - name: Push to Radicle
-        run: git push rad main
+      - name: Push to GitLab
+        run: git push gitlab main 
