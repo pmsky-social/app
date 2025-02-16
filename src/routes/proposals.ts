@@ -1,10 +1,10 @@
-import { ALL_PROPOSAL_TYPES, ProposalType } from "#/db/types";
+import { ALL_PROPOSAL_TYPES } from "#/db/types";
 import { page } from "#/lib/view";
 import { createProposal } from "#/views/pages/createProposal";
 import { AppContext } from "..";
 import { ContextualHandler } from "./ContextualHandler";
 
-export const ALLOWED_LABEL_VALUES = ["test", "test2"];
+export const ALLOWED_LABEL_VALUES = ["wholesome", "helpful", "banger"];
 
 export class GetCreate extends ContextualHandler {
   constructor(ctx: AppContext) {
