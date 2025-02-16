@@ -37,22 +37,24 @@ function ts(label: FeedProposal) {
 function voting(label: FeedProposal) {
   const score = Math.floor(label.score);
   return html`
-    <form method="post" class="vote" action="/vote" rel="noopener">
+    <form class="vote">
       <input name="uri" value="${label.uri}" type="hidden" />
       <button
         ?disabled=${label.voted}
-        title="Agree"
+        title=${label.voted ? "Thanks for voting!" : "Agree"}
         name="direction"
         value="up"
+        hx-post="/vote"
       >
         +
       </button>
       <button disabled class="secondary score">${score}</button>
       <button
         ?disabled=${label.voted}
-        title="Disagree"
+        title=${label.voted ? "Thanks for voting!" : "Disagree"}
         name="direction"
         value="down"
+        hx-post="vote"
       >
         -
       </button>
