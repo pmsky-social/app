@@ -67,7 +67,7 @@ function logout(isLoggedIn: boolean) {
     title="Log out"
     class="logout"
     hx-post="/logout"
-    hx-target="html"
+    hx-target="body"
   >
     ✖
   </button>`;
