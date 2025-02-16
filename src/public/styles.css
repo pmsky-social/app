@@ -83,20 +83,18 @@ button,
 .button {
   display: inline-block;
   border: 0;
-  background-color: var(--primary-500);
   border-radius: 50px;
-  color: var(--background-color);
   padding: 2px 10px;
   cursor: pointer;
   text-decoration: none;
 }
 
-button:hover,
-.button:hover {
-  background: var(--primary-400);
-}
 
 button.secondary {
+  background-color: var(--gray-7);
+}
+
+button.secondary:hover {
   background-color: var(--gray-5);
 }
 
@@ -332,4 +330,16 @@ form.createProposal select {
 
 form.createProposal #cancel-button {
   margin-bottom: 1em;
+}
+
+header {
+  margin-bottom: 1em;
+}
+
+.feed {
+  padding-top: 2em;
+}
+
+.feed .empty-feed {
+  text-align: center;
 }

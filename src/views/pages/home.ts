@@ -70,7 +70,7 @@ function content({ proposals, isMeta }: Props) {
   return html`
     <div class="container">
       <div class="row">${createProposalLink()} ${metaLink(isMeta)}</div>
-      <div>${feed(proposals)}</div>
+      <div class="feed">${feed(proposals)}</div>
     </div>
   `;
 }
@@ -85,7 +85,9 @@ function metaLink(curr: boolean) {
   const url = curr ? "/" : "/?meta=true";
   const title = curr ? "View proposals" : "View meta proposals";
   const label = curr ? "Main" : "Meta";
-  return html`<a href="${url}"><button title="${title}">${label}</button></a>`;
+  return html`<a href="${url}"
+    ><button class="secondary" title="${title}">${label}</button></a
+  >`;
 }
 
 function toBskyLink(did: string) {
@@ -95,5 +97,10 @@ function toBskyLink(did: string) {
 function feed(proposals: FeedProposal[]) {
   // returns a list of labels to vote on
   // TODO: add pagination, filters
+  if (proposals.length === 0) {
+    return html`<p class="empty-feed">
+      Nothing to vote on right now. Create a proposal!
+    </p>`;
+  }
   return html`${proposals.map(proposalCard)}`;
 }

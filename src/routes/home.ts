@@ -8,6 +8,7 @@ import { ContextualHandler } from "./ContextualHandler";
 import { getSessionAgent } from "./util";
 import { VoteRepository } from "#/db/repos/voteRepository";
 import { Proposal, ProposalType } from "#/db/types";
+import { sql } from "kysely";
 
 export class GetHomePage extends ContextualHandler {
   constructor(ctx: AppContext) {
@@ -31,17 +32,17 @@ export class GetHomePage extends ContextualHandler {
       // );
 
       // Fetch additional information about the logged-in user
-      const { data: profileRecord } = await agent.com.atproto.repo.getRecord({
-        repo: agent.assertDid,
-        collection: "app.bsky.actor.profile",
-        rkey: "self",
-      });
+      // const { data: profileRecord } = await agent.com.atproto.repo.getRecord({
+      //   repo: agent.assertDid,
+      //   collection: "app.bsky.actor.profile",
+      //   rkey: "self",
+      // });
 
-      const profile =
-        Profile.isRecord(profileRecord.value) &&
-        Profile.validateRecord(profileRecord.value).success
-          ? profileRecord.value
-          : {};
+      // const profile =
+      //   Profile.isRecord(profileRecord.value) &&
+      //   Profile.validateRecord(profileRecord.value).success
+      //     ? profileRecord.value
+      //     : {};
 
       // Serve the logged-in view
       return res.type("html").send(
@@ -63,10 +64,15 @@ export class GetHomePage extends ContextualHandler {
       .selectFrom("proposals")
       .selectAll()
       .where("type", "=", proposalType)
+      .whereRef("indexedAt", ">=", sql`date('now', '-1 day')`)
       .orderBy("indexedAt", "desc")
       .limit(10)
       .execute()
-      .then((rows) => rows.map((r) => Proposal.fromDB(r)));
+      .then((rows) => rows.map((r) => Proposal.fromDB(r)))
+      .catch((e) => {
+        this.ctx.logger.error(e, "Error fetching proposals!");
+        throw new Error(e);
+      });
 
     const uris = proposals.map(
       (l) => `at://${l.src}/social.pmsky.label/${l.rkey}`
