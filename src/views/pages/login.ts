@@ -27,8 +27,8 @@ function content({ error }: Props) {
         <button type="submit">Log in</button>
       </form>
       <div class="signup-cta">
-        Don't have an account on the Atmosphere?
-        <a href="https://bsky.app">Sign up for Bluesky</a> to create one now!
+        Don't have an account on the <a href="//atproto.com">Atmosphere</a>?
+        <a href="https://bsky.app">Sign up on Bluesky</a> to create one now!
       </div>
     </div>
   </div>`;
