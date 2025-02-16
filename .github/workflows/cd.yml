@@ -32,6 +32,9 @@ jobs:
       - name: Install Radicle CLI (example)
         run: curl -sSf https://radicle.xyz/install | sh
 
+      - name: Authenticate with Radicle
+        run: rad auth
+
       - name: Configure Git Remote for Radicle
         run: |
           # Add a new remote named "rad" for your Radicle project.
@@ -40,6 +43,4 @@ jobs:
           git remote set-url rad "rad://rad:z2swoV1DQeLYhiC6cAKmMHHEpWKvQ"
 
       - name: Push to Radicle
-        run: |
-          # Force-push the main branch to your Radicle remote.
-          git push rad main
+        run: git push rad main
