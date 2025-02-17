@@ -45,14 +45,7 @@ export class GetHomePage extends ContextualHandler {
       //     : {};
 
       // Serve the logged-in view
-      return res.type("html").send(
-        page(
-          home({
-            proposals,
-            isMeta,
-          })
-        )
-      );
+      return res.type("html").send(page(home({ proposals, isMeta })));
     });
   }
 
@@ -75,9 +68,7 @@ export class GetHomePage extends ContextualHandler {
         throw new Error(e);
       });
 
-    const uris = proposals.map(
-      (l) => `at://${l.src}/social.pmsky.label/${l.rkey}`
-    );
+    const uris = proposals.map((l) => l.uri);
 
     const embeds = await this.ctx.db
       .selectFrom("posts")

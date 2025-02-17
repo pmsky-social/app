@@ -289,17 +289,12 @@ a .card {
   color: var(--gray-3);
 }
 
-.card .proposal-subject {
+.card .proposal-subject,
+.card .proposal-timestamp {
   font-size: 14px;
   color: var(--gray-5);
 }
 
-/* Timestamp */
-.card-timestamp {
-  font-size: 12px;
-  color: var(--gray-5);
-  margin-bottom: 8px;
-}
 
 /* Score Badge */
 .card-score .score-badge {
