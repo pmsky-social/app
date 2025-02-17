@@ -1,8 +1,6 @@
 import { TID } from "@atproto/common";
-import { Database } from "../migrations";
 import { Proposal, ProposalType } from "../types";
 import { sql } from "kysely";
-import { AtprotoServiceAccount } from "#/serviceAccount";
 import { AppContext } from "#/index";
 
 export class AllowedUsersRepository {

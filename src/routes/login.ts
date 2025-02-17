@@ -6,6 +6,7 @@ import type { AppContext } from "..";
 import { ContextualHandler } from "./ContextualHandler";
 import { getSession } from "./util";
 import { AllowedUsersRepository } from "#/db/repos/allowedUsersRepository";
+import { HandleNotWhitelisted } from "#/errors";
 
 export class GetLogin extends ContextualHandler {
   constructor(ctx: AppContext) {
@@ -27,7 +28,7 @@ export class PostLogin extends ContextualHandler {
       if (!(await isWhitelisted(ctx, did))) {
         return res
           .type("html")
-          .send(page(login({ error: "unauthorized handle" })));
+          .send(page(login({ errorType: new HandleNotWhitelisted(handle) })));
       }
       // Initiate the OAuth flow
       try {
