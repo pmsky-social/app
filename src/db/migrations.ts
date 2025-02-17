@@ -4,6 +4,7 @@ import {
   type Migration,
   type MigrationProvider,
   Migrator,
+  sql,
   SqliteDialect,
 } from "kysely";
 import { DatabaseSchema, ProposalType } from "./types";
@@ -99,12 +100,7 @@ const migrations: Record<string, Migration> = {
       ];
       await db
         .insertInto("allowed_users")
-        .values(
-          init_whitelist.map((handle, i) => ({
-            id: i,
-            handle,
-          }))
-        )
+        .values(init_whitelist.map((handle, i) => ({ id: i, handle })))
         .execute();
     },
   },
@@ -162,15 +158,30 @@ const migrations: Record<string, Migration> = {
         .execute();
     },
   },
+  "009": {
+    async up(db: Kysely<DatabaseSchema>) {
+      await db.schema
+        .alterTable("proposals")
+        .addColumn("uri", "varchar")
+        .execute();
+
+      await db
+        .updateTable("proposals")
+        .where("uri", "is", null)
+        .set(
+          "uri",
+          sql`CONCAT('at://did:plc:xhkqwjmxuo65vwbwuiz53qor/social.pmsky.label/', rkey)`
+        )
+        .execute();
+    },
+  },
 };
 
 // APIs
 
 export const createDb = (location: string): Database => {
   return new Kysely<DatabaseSchema>({
-    dialect: new SqliteDialect({
-      database: new SqliteDb(location),
-    }),
+    dialect: new SqliteDialect({ database: new SqliteDb(location) }),
   });
 };
 

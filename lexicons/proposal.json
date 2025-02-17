@@ -1,0 +1,69 @@
+{
+    "lexicon": 1,
+    "id": "social.pmsky.proposal",
+    "defs": {
+        "main": {
+            "type": "record",
+            "key": "tid",
+            "record": {
+                "type": "object",
+                "description": "Replicates `com.atproto.label.defs#label, but as a concrete record type",
+                "required": [
+                    "typ",
+                    "src",
+                    "uri",
+                    "val",
+                    "cts"
+                ],
+                "properties": {
+                    "ver": {
+                        "type": "integer",
+                        "description": "The AT Protocol version of the label object."
+                    },
+                    "typ": {
+                        "type": "string",
+                        "description": "the type of proposal, currently expected values are 'allowed_user' or 'post_label'"
+                    },
+                    "src": {
+                        "type": "string",
+                        "format": "did",
+                        "description": "DID of the actor who created this label."
+                    },
+                    "uri": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "AT URI of the record, repository (account), or other resource that this label applies to."
+                    },
+                    "cid": {
+                        "type": "string",
+                        "format": "cid",
+                        "description": "Optionally, CID specifying the specific version of 'uri' resource this label applies to."
+                    },
+                    "val": {
+                        "type": "string",
+                        "maxLength": 128,
+                        "description": "The short string name of the value or type of this label."
+                    },
+                    "neg": {
+                        "type": "boolean",
+                        "description": "If true, this is a negation label, overwriting a previous label."
+                    },
+                    "cts": {
+                        "type": "string",
+                        "format": "datetime",
+                        "description": "Timestamp when this label was created."
+                    },
+                    "exp": {
+                        "type": "string",
+                        "format": "datetime",
+                        "description": "Timestamp at which this label expires (no longer applies)."
+                    },
+                    "sig": {
+                        "type": "bytes",
+                        "description": "Signature of dag-cbor encoded label."
+                    }
+                }
+            }
+        }
+    }
+}

@@ -10,7 +10,7 @@ import type { Logger } from "pino";
 import { v4 as uuid } from "uuid";
 import { env } from "#/lib/env";
 import { SvcActCredsStore } from "./auth/storage";
-import { SOCIAL_PMSKY_LABEL, SVC_ACT_SESSION_KEY } from "./constants";
+import { SOCIAL_PMSKY_PROPOSAL, SVC_ACT_SESSION_KEY } from "./constants";
 import type { Database } from "./db/migrations";
 import {
   AlreadyVoted,
@@ -21,9 +21,9 @@ import {
   ProposalNotFound as ProposalNotFound,
 } from "./error";
 import {
-  validateRecord as validateLabel,
-  Record as LabelRecord,
-} from "./lexicon/types/social/pmsky/label";
+  validateRecord as validateProposal,
+  Record as ProposalRecord,
+} from "./lexicon/types/social/pmsky/proposal";
 import { VoteRepository } from "./db/repos/voteRepository";
 import { Record as VoteRecord } from "./lexicon/types/social/pmsky/vote";
 import { Proposal, ProposalType } from "./db/types";
@@ -95,7 +95,7 @@ export class AtprotoServiceAccount {
   }
 
   private async putRecord(
-    record: LabelRecord | VoteRecord,
+    record: ProposalRecord | VoteRecord,
     collection: string,
     rkey: string
   ) {
@@ -123,22 +123,23 @@ export class AtprotoServiceAccount {
     }
     // Construct & validate label record
     const rkey = TID.nextStr();
-    const record: LabelRecord = {
-      $type: SOCIAL_PMSKY_LABEL,
+    const record: ProposalRecord = {
+      $type: SOCIAL_PMSKY_PROPOSAL,
+      typ: ProposalType.POST_LABEL,
       src: this.did(),
       uri: subject,
       val: label,
       cts: new Date().toISOString(),
     };
 
-    const validationResult = validateLabel(record);
+    const validationResult = validateProposal(record);
     if (!validationResult.success) {
-      this.logger.error(validationResult, "invalid label record: ");
-      throw new InvalidRecord(SOCIAL_PMSKY_LABEL);
+      this.logger.error(validationResult, "invalid proposal record: ");
+      throw new InvalidRecord(SOCIAL_PMSKY_PROPOSAL);
     }
 
     // todo: make sure if this fails, it's handled correctly
-    const uri = await this.putRecord(record, SOCIAL_PMSKY_LABEL, rkey);
+    const uri = await this.putRecord(record, SOCIAL_PMSKY_PROPOSAL, rkey);
     this.logger.trace({ uri }, "published label to atproto");
 
     try {
@@ -156,6 +157,7 @@ export class AtprotoServiceAccount {
           subject,
           createdAt: record.cts,
           indexedAt: new Date().toISOString(),
+          uri: record.uri,
         } as Proposal)
         .execute();
       this.logger.trace("saved new label to local db");
@@ -182,7 +184,7 @@ export class AtprotoServiceAccount {
       return undefined;
     }
     const { rkey, src } = row;
-    const uri = `at://${src}/social.pmsky.label/${rkey}`;
+    const uri = `at://${src}/${SOCIAL_PMSKY_PROPOSAL}/${rkey}`;
     return uri;
   }
 

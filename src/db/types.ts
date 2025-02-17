@@ -28,6 +28,7 @@ export class Proposal {
   createdAt!: string;
   indexedAt!: string;
   indexedBy!: string;
+  uri?: string;
 
   constructor(
     rkey: string,
@@ -37,7 +38,8 @@ export class Proposal {
     subject: string,
     createdAt: string,
     indexedAt: string,
-    indexedBy: string
+    indexedBy: string,
+    uri?: string
   ) {
     this.rkey = rkey;
     this.src = src;
@@ -47,15 +49,21 @@ export class Proposal {
     this.createdAt = createdAt;
     this.indexedAt = indexedAt;
     this.indexedBy = indexedBy;
-  }
-
-  uri(): string {
-    return `at://${this.src}/social.pmsky.label/${this.rkey}`;
+    this.uri = uri || `at://${this.src}/social.pmsky.label/${this.rkey}`;
   }
 
   static fromDB(row: DatabaseSchema["proposals"]) {
-    const { rkey, src, type, val, subject, createdAt, indexedAt, indexedBy } =
-      row;
+    const {
+      rkey,
+      src,
+      type,
+      val,
+      subject,
+      createdAt,
+      indexedAt,
+      indexedBy,
+      uri,
+    } = row;
     return new Proposal(
       rkey,
       src,
@@ -64,15 +72,13 @@ export class Proposal {
       subject,
       createdAt,
       indexedAt,
-      indexedBy
+      indexedBy,
+      uri
     );
   }
 }
 
-export type Post = {
-  uri: string;
-  embed: string;
-};
+export type Post = { uri: string; embed: string };
 
 // this struct only tracks the labels and voters, no vote values or record URIs
 export type UserVote = {
@@ -99,26 +105,14 @@ export function ProposalVoteUri(src: string, rkey: string) {
   return `at://${src}/social.pmsky.vote/${rkey}`;
 }
 
-export type AuthSession = {
-  key: string;
-  session: AuthSessionJson;
-};
+export type AuthSession = { key: string; session: AuthSessionJson };
 
-export type AuthState = {
-  key: string;
-  state: AuthStateJson;
-};
+export type AuthState = { key: string; state: AuthStateJson };
 
 type AuthStateJson = string;
 
 type AuthSessionJson = string;
 
-export type CursorLog = {
-  datetime: number;
-  cursor: number;
-};
+export type CursorLog = { datetime: number; cursor: number };
 
-export type AllowedUser = {
-  id: number;
-  handle: string;
-};
+export type AllowedUser = { id: number; handle: string };

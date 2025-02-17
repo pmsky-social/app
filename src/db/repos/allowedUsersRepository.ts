@@ -9,7 +9,7 @@ export class AllowedUsersRepository {
   async getWhitelistedDids() {
     return await this.ctx.db
       .selectFrom("proposals as p")
-      .leftJoin("proposal_votes as pv", "pv.subject", "p.rkey")
+      .leftJoin("proposal_votes as pv", "pv.subject", "p.uri")
       .select("p.subject")
       .groupBy("p.subject")
       .having(sql`SUM(${sql.ref("pv.val")})`, ">", 0)
@@ -40,7 +40,8 @@ export class AllowedUsersRepository {
           did,
           new Date().toISOString(),
           new Date().toISOString(),
-          "allowedUsersRepository.proposeAllowUser"
+          "allowedUsersRepository.proposeAllowUser",
+          `at://${this.ctx.atSvcAct.did()}/social.pmsky.proposal/${rkey}`
         )
       )
       .execute();

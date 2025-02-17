@@ -131,13 +131,16 @@ async function saveLabel(
       subject: record.uri,
       createdAt: record.cts,
       indexedAt: now.toISOString(),
+      uri: `at://${evt.did}/social.pmsky.proposal/${evt.commit.rkey.toString()}`,
     } as Proposal)
     .onConflict((oc) =>
-      oc.column("rkey").doUpdateSet({
-        val: record.val,
-        subject: record.uri,
-        indexedAt: now.toISOString(),
-      })
+      oc
+        .column("rkey")
+        .doUpdateSet({
+          val: record.val,
+          subject: record.uri,
+          indexedAt: now.toISOString(),
+        })
     )
     .execute();
 }
@@ -164,11 +167,13 @@ async function saveVote(
       indexedBy: "ingester.saveVote",
     })
     .onConflict((oc) =>
-      oc.column("uri").doUpdateSet({
-        val: record.val as 1 | -1,
-        subject: record.uri,
-        indexedAt: now.toISOString(),
-      })
+      oc
+        .column("uri")
+        .doUpdateSet({
+          val: record.val as 1 | -1,
+          subject: record.uri,
+          indexedAt: now.toISOString(),
+        })
     )
     .execute();
 }
