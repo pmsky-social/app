@@ -38,7 +38,7 @@ export class AllowedUsersRepository {
           rkey,
           this.ctx.atSvcAct.did(),
           ProposalType.ALLOWED_USER,
-          "Whitelist?",
+          "Whitelist",
           did,
           new Date().toISOString(),
           new Date().toISOString(),
