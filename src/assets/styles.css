@@ -74,7 +74,11 @@
 body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
-  background-color: var(--nc-bg-2);
+  background-color: var(--nc-bg-1);
+  min-height: 100vh;
+  width: 100vw;
+  max-width: 100vw;
+  padding: 2rem 0 0 0;
 }
 
 main {
@@ -408,12 +412,6 @@ p.create-help-text {
   text-align: left;
   padding: 1em;
   color: var(--gray-4);
-}
-
-body {
-  min-height: 100vh;
-  width: 100vw;
-  max-width: 100vw;
 }
 
 
