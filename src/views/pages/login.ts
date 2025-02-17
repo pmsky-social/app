@@ -4,11 +4,7 @@ import { shell } from "./shell";
 type Props = { error?: string };
 
 export function login(props: Props) {
-  return shell({
-    path: ["login"],
-    title: "Log in",
-    content: content(props),
-  });
+  return shell({ path: ["login"], title: "Log in", content: content(props) });
 }
 
 // todo: link to docs on requesting access if error == "unauthorized handle"
@@ -18,7 +14,7 @@ function content({ error }: Props) {
       ${error
         ? html`<p class="error visible">Error: <i>${error}</i></p>`
         : undefined}
-      <form action="/login" method="post" class="login-form">
+      <form action="/login" method="post" class="login">
         <input
           type="text"
           name="handle"

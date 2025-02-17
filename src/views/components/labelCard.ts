@@ -9,7 +9,7 @@ export function proposalCard(proposal: FeedProposal) {
   const title =
     proposal.type == ProposalType.POST_LABEL
       ? proposal.val
-      : `@${proposal.handle}`;
+      : `${proposal.val} @${proposal.handle}`;
   return html`
     <div class="card">
       <a href="${href}">
