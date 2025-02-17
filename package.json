@@ -11,6 +11,7 @@
     "dev": "tsx watch --clear-screen=false src/index.ts | pino-pretty",
     "check": "tsc --strict",
     "build": "npm run check && tsup",
+    "postbuild": "cp public/* dist/",
     "test": "echo No tests yet!",
     "start": "node dist/index.js",
     "lexgen": "lex gen-server ./src/lexicon ./lexicons/*",
