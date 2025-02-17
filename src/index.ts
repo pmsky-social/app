@@ -77,7 +77,11 @@ export class Server {
     const router = createRouter(ctx);
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
-    app.use("/public", express.static(path.join(__dirname, "public")));
+    app.use("/assets", express.static(path.join(__dirname, "assets")));
+    app.use(
+      "/favicon.ico",
+      express.static(path.join(__dirname, "favicon.ico"))
+    );
     app.use(router);
     app.use((_req, res) => res.sendStatus(404));
 

@@ -25,7 +25,7 @@ export function shell({
         rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/@exampledev/new.css@1.1.2/new.min.css"
       />
-      <link rel="stylesheet" href="/public/styles.css" />
+      <link rel="stylesheet" href="/assets/styles.css" />
       <script src="https://unpkg.com/htmx.org@2.0.4"></script>
       <script
         src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
