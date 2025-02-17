@@ -53,68 +53,43 @@ export class GetHomePage extends ContextualHandler {
     agent: Agent,
     proposalType: ProposalType = ProposalType.POST_LABEL
   ): Promise<FeedProposal[]> {
-    // todo: turn this into one big JOINed query
-    const proposals = await this.ctx.db
-      .selectFrom("proposals")
-      .selectAll()
+    return await this.ctx.db
+      .selectFrom("proposals as p")
       .where("type", "=", proposalType)
-      .whereRef("createdAt", ">=", sql`date('now', '-1 day')`)
-      .orderBy("createdAt", "desc")
+      .whereRef("p.createdAt", ">=", sql`date('now', '-1 day')`)
+      .orderBy("p.createdAt", "desc")
+      .leftJoin("posts", "posts.uri", "p.subject")
+      .leftJoin("proposal_votes", "proposal_votes.subject", "p.uri")
+      .leftJoin("user_votes", "user_votes.subject", "p.uri")
+      .where("user_votes.src", "=", agent.assertDid)
+      .groupBy("p.uri")
       .limit(10)
+      .select((eb) => [
+        "p.rkey",
+        "p.src",
+        "p.subject",
+        "p.type",
+        "p.uri",
+        "p.val",
+        "p.createdAt",
+        "p.indexedAt",
+        "p.indexedBy",
+        "posts.embed",
+        sql<number>`SUM(${sql.ref("proposal_votes.val")})`.as("score"),
+        sql<boolean>`case when ${sql.ref("user_votes.src")} is null then false else true end`.as(
+          "alreadyVoted"
+        ),
+      ])
       .execute()
-      .then((rows) => rows.map((r) => Proposal.fromDB(r)))
+      .then(
+        async (rows) =>
+          await Promise.all(
+            rows.map((row) => feedProposalFromDB(row, this.ctx))
+          )
+      )
       .catch((e) => {
         this.ctx.logger.error(e, "Error fetching proposals!");
         throw new Error(e);
       });
-
-    const uris = proposals.map((l) => l.uri);
-
-    const embeds = await this.ctx.db
-      .selectFrom("posts")
-      .selectAll()
-      .where("uri", "in", uris)
-      .execute()
-      .then((rows) =>
-        rows.reduce(
-          (acc, row) => {
-            acc[row.uri] = row.embed;
-            return acc;
-          },
-          {} as Record<string, string>
-        )
-      );
-
-    this.ctx.logger.trace(uris, "fetched proposals for route /home");
-    const alreadyVoted = await this.ctx.db
-      .selectFrom("user_votes")
-      .select("subject")
-      .where("src", "=", agent.assertDid)
-      .where("subject", "in", uris)
-      .execute();
-
-    // this.ctx.logger.trace(
-    //   alreadyVoted,
-    //   "fetched which votes already happened for route /home"
-    // );
-
-    const scores = await new VoteRepository(
-      this.ctx.db,
-      this.ctx.logger
-    ).getLabelScores(uris);
-
-    // this.ctx.logger.trace(scores, "fetched scores for labels");
-    return await Promise.all(
-      proposals.map(
-        async (l) =>
-          await feedProposalFromDB(
-            l,
-            embeds[l.subject],
-            alreadyVoted,
-            scores,
-            this.ctx
-          )
-      )
-    );
   }
 }
