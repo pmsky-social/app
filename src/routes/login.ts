@@ -24,7 +24,7 @@ export class PostLogin extends ContextualHandler {
         return res.type("html").send(page(login({ error: "invalid handle" })));
       }
       const did = await ctx.atSvcAct.resolveHandle(handle);
-      if (handle !== "drewmca.dev" && !(await isWhitelisted(ctx, did))) {
+      if (!(await isWhitelisted(ctx, did))) {
         return res
           .type("html")
           .send(page(login({ error: "unauthorized handle" })));
@@ -38,16 +38,18 @@ export class PostLogin extends ContextualHandler {
         return res.redirect(url.toString());
       } catch (err) {
         ctx.logger.error({ err }, "oauth authorize failed");
-        return res.type("html").send(
-          page(
-            login({
-              error:
-                err instanceof OAuthResolverError
-                  ? err.message
-                  : "couldn't initiate login",
-            })
-          )
-        );
+        return res
+          .type("html")
+          .send(
+            page(
+              login({
+                error:
+                  err instanceof OAuthResolverError
+                    ? err.message
+                    : "couldn't initiate login",
+              })
+            )
+          );
       }
     });
   }
