@@ -458,7 +458,16 @@ p.create-help-text {
   }
 
   form.login button {
-    padding: 1em 2em;
     border-radius: 10%;
+  }
+
+  form input,
+  select,
+  button {
+    padding: 1em 2em;
+  }
+
+  button {
+    border-radius: 1em;
   }
 }
