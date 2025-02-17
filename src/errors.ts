@@ -7,16 +7,16 @@ export class ClientError extends Error {
 }
 
 export class HandleNotWhitelisted extends Error {
-  constructor(handle: string) {
-    super(`handle (@${handle}) is not whitelisted`);
+  constructor(private handle: string) {
+    super(`handle is not whitelisted`);
   }
 
   render(): Hole {
-    return html`<p class="error visible">Error: <i>${this.message}.</i></p>
-      <p class="error visible">
-        <a href="https://docs.pmsky.social/getting-started/request-access"
-          >Learn how to request access.</a
-        >
-      </p>`;
+    return html`<p class="error visible" title="${this.handle}">
+      Error: <i>${this.message}.</i>
+      <a href="https://docs.pmsky.social/getting-started/request-access"
+        >Learn how to request access.</a
+      >
+    </p>`;
   }
 }
