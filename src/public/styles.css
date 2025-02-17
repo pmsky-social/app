@@ -415,18 +415,28 @@ p.create-help-text {
   color: var(--gray-4);
 }
 
+body {
+  height: 100vh;
+  width: 100vw;
+  max-width: 100vw;
+}
+
+
+main {
+  height: 100%;
+  width: 100%;
+}
+
+#root {
+  max-width: 750px;
+  margin: 0 auto;
+}
+
 @media screen and (max-width: 600px) {
-  body {
-    height: 100vh;
-  }
 
   header,
   main {
     padding: 0 .2em;
-  }
-
-  main {
-    height: 100%;
   }
 
   #header h1 {
@@ -469,5 +479,10 @@ p.create-help-text {
 
   button {
     border-radius: 1em;
+  }
+
+  form.vote button {
+    font-size: 1.3em;
+    padding: 0.5em 1em;
   }
 }
