@@ -75,11 +75,11 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   background-color: var(--nc-bg-2);
-  padding: 2rem 0;
 }
 
 main {
   background-color: var(--nc-bg-1);
+  padding: 2rem 0;
 }
 
 img,
@@ -289,7 +289,7 @@ a .card {
   color: var(--gray-3);
 }
 
-.proposal-subject {
+.card .proposal-subject {
   font-size: 14px;
   color: var(--gray-5);
 }
@@ -416,7 +416,7 @@ p.create-help-text {
 }
 
 body {
-  height: 100vh;
+  min-height: 100vh;
   width: 100vw;
   max-width: 100vw;
 }
