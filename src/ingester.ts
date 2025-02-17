@@ -45,11 +45,11 @@ export function createJetstreamIngester(db: Database, idResolver: IdResolver) {
   });
 
   jetstream.on("open", () => {
-    logger.info("jetstream opened");
+    logger.trace("jetstream opened");
   });
 
   jetstream.on("close", () => {
-    logger.info("jetstream closed");
+    logger.trace("jetstream closed");
   });
 
   jetstream.on("error", (err) => {
@@ -134,13 +134,11 @@ async function saveLabel(
       uri: `at://${evt.did}/social.pmsky.proposal/${evt.commit.rkey.toString()}`,
     } as Proposal)
     .onConflict((oc) =>
-      oc
-        .column("rkey")
-        .doUpdateSet({
-          val: record.val,
-          subject: record.uri,
-          indexedAt: now.toISOString(),
-        })
+      oc.column("rkey").doUpdateSet({
+        val: record.val,
+        subject: record.uri,
+        indexedAt: now.toISOString(),
+      })
     )
     .execute();
 }
@@ -167,13 +165,11 @@ async function saveVote(
       indexedBy: "ingester.saveVote",
     })
     .onConflict((oc) =>
-      oc
-        .column("uri")
-        .doUpdateSet({
-          val: record.val as 1 | -1,
-          subject: record.uri,
-          indexedAt: now.toISOString(),
-        })
+      oc.column("uri").doUpdateSet({
+        val: record.val as 1 | -1,
+        subject: record.uri,
+        indexedAt: now.toISOString(),
+      })
     )
     .execute();
 }

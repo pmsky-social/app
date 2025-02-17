@@ -157,7 +157,7 @@ export class AtprotoServiceAccount {
           subject,
           createdAt: record.cts,
           indexedAt: new Date().toISOString(),
-          uri: record.uri,
+          uri: `at://${record.src}/social.pmsky.proposal/${rkey}`,
         } as Proposal)
         .execute();
       this.logger.trace("saved new label to local db");
@@ -233,9 +233,12 @@ export class AtprotoServiceAccount {
   }
 
   async publishVote(vote: 1 | -1, proposalUri: string, userDid: string) {
-    this.logger.trace({ vote, proposalUri, userDid }, "svc act publish vote");
+    this.logger.trace(
+      { vote, subject: proposalUri, userDid },
+      "svc act publish vote"
+    );
     // check that labelUri exists in DB, if not throw error
-    if (!(await this.proposalExists({ proposalUri })))
+    if (!(await this.proposalExists({ proposalUri: proposalUri })))
       throw new ProposalNotFound(proposalUri);
     if (await this.userVotedAlready(userDid, proposalUri))
       throw new AlreadyVoted(proposalUri);

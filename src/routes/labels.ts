@@ -87,8 +87,8 @@ export class PostProposal extends ContextualHandler {
   ) {
     const label = req.body.label;
     let subject = req.body.subject;
-    this.ctx.logger.info(`label: ${label}`);
-    this.ctx.logger.info(`subject: ${subject}`);
+    this.ctx.logger.trace(`label: ${label}`);
+    this.ctx.logger.trace(`subject: ${subject}`);
 
     if (!isAllowed(label)) {
       this.ctx.logger.warn(

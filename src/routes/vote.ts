@@ -17,6 +17,7 @@ export class PostVote extends ContextualHandler {
       try {
         await ctx.atSvcAct.publishVote(vote, uri, agent.did);
       } catch (err) {
+        // todo: handle proposal not found and already voted errors diff
         ctx.logger.error({ err }, "publish vote failed");
         return res.status(500).send(err);
       }

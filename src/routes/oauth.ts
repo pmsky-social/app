@@ -12,7 +12,7 @@ export class GetClientMetadata extends ContextualHandler {
 export class GetOauthCallback extends ContextualHandler {
   constructor(ctx: AppContext) {
     super(ctx, async (req, res) => {
-      ctx.logger.info("oauth callback received");
+      ctx.logger.trace("oauth callback received");
       const params = new URLSearchParams(req.originalUrl.split("?")[1]);
       try {
         const { session } = await ctx.oauthClient.callback(params);
