@@ -29,18 +29,18 @@ export async function feedProposalFromDB(
 ): Promise<FeedProposal> {
   return {
     rkey: p.rkey,
-    uri: p.uri(),
+    uri: p.uri,
     val: p.val,
     type: p.type,
     subject: p.subject,
-    voted: alreadyVoted.some((v) => v.subject === p.uri()),
+    voted: alreadyVoted.some((v) => v.subject === p.uri),
     embed: embed
       ? // @ts-ignore
         html([embed])
       : p.type === ProposalType.POST_LABEL
         ? await getCachedPostEmbed(ctx, p.subject)
         : undefined,
-    score: scores[p.uri()] || 0,
+    score: scores[p.uri] || 0,
     handle:
       p.type === ProposalType.ALLOWED_USER
         ? await ctx.resolver.resolveDidToHandle(p.subject)
@@ -58,11 +58,7 @@ type Props = {
 };
 
 export function home(props: Props) {
-  return shell({
-    path: [],
-    title: "Home",
-    content: content(props),
-  });
+  return shell({ path: [], title: "Home", content: content(props) });
 }
 
 function content({ proposals, isMeta }: Props) {

@@ -28,7 +28,7 @@ export class Proposal {
   createdAt!: string;
   indexedAt!: string;
   indexedBy!: string;
-  uri?: string;
+  uri: string;
 
   constructor(
     rkey: string,
