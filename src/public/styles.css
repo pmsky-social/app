@@ -211,7 +211,7 @@ form {
   justify-content: space-between;
 }
 
-.login-form {
+.login {
   gap: 6px;
   border: 1px solid var(--border-color);
   border-radius: 6px;
@@ -219,7 +219,7 @@ form {
   background-color: var(--background-color);
 }
 
-.login-form input {
+.login input {
   flex: 1;
   border: 0;
   margin-bottom: 0;
@@ -441,7 +441,7 @@ p.create-help-text {
     padding: 20px 0;
   }
 
-  form.login-form {
+  form.login {
     flex-direction: column;
     border: none;
     background: none;
@@ -449,7 +449,7 @@ p.create-help-text {
     margin-bottom: 1.5em;
   }
 
-  form.login-form input {
+  form.login input {
     width: 100%;
     border: 1px solid var(--border-color);
     background-color: var(--background-color);
@@ -457,7 +457,7 @@ p.create-help-text {
     margin: 1em 0;
   }
 
-  form.login-form button {
+  form.login button {
     padding: 1em 2em;
     border-radius: 10%;
   }
