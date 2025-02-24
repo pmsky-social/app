@@ -21,32 +21,41 @@ export type FeedProposal = {
 };
 
 export async function feedProposalFromDB(
-  p: Proposal,
-  embed: string | undefined,
-  alreadyVoted: { subject: string }[],
-  scores: { [uri: string]: number },
+  row: {
+    rkey: string;
+    uri: string;
+    val: string;
+    type: ProposalType;
+    subject: string;
+    createdAt: string;
+    indexedAt: string;
+    indexedBy: string;
+    alreadyVoted: boolean;
+    score: number | null;
+    embed: string | null;
+  },
   ctx: AppContext
 ): Promise<FeedProposal> {
   return {
-    rkey: p.rkey,
-    uri: p.uri,
-    val: p.val,
-    type: p.type,
-    subject: p.subject,
-    voted: alreadyVoted.some((v) => v.subject === p.uri),
-    embed: embed
+    rkey: row.rkey,
+    uri: row.uri,
+    val: row.val,
+    type: row.type,
+    subject: row.subject,
+    voted: row.alreadyVoted,
+    embed: row.embed
       ? // @ts-ignore
         html([embed])
-      : p.type === ProposalType.POST_LABEL
-        ? await getCachedPostEmbed(ctx, p.subject)
+      : row.type === ProposalType.POST_LABEL
+        ? await getCachedPostEmbed(ctx, row.subject)
         : undefined,
-    score: scores[p.uri] || 0,
+    score: row.score || 0,
     handle:
-      p.type === ProposalType.ALLOWED_USER
-        ? await ctx.resolver.resolveDidToHandle(p.subject)
+      row.type === ProposalType.ALLOWED_USER
+        ? await ctx.resolver.resolveDidToHandle(row.subject)
         : undefined,
-    createdAt: p.createdAt,
-    indexedAt: p.indexedAt,
+    createdAt: row.createdAt,
+    indexedAt: row.indexedAt,
   };
 }
 
