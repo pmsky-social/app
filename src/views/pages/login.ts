@@ -1,21 +1,18 @@
 import { ClientError } from "#/errors";
-import { html } from "#/lib/view";
+import { Hole, html } from "#/lib/view";
 import { shell } from "./shell";
 
-type Props = { error?: string; errorType?: ClientError };
+type Props = { error?: string | ClientError };
 
 export function login(props: Props) {
   return shell({ path: ["login"], title: "Log in", content: content(props) });
 }
 
-// todo: link to docs on requesting access if error == "unauthorized handle"
-function content({ error, errorType }: Props) {
+function content({ error }: Props) {
+  const renderedError = renderError(error);
   return html`<div id="root">
     <div class="container">
-      ${error
-        ? html`<p class="error visible">Error: <i>${error}</i></p>`
-        : undefined}
-      ${errorType ? errorType.render() : undefined}
+      ${renderedError}
       <form action="/login" method="post" class="login">
         <input
           type="text"
@@ -31,4 +28,12 @@ function content({ error, errorType }: Props) {
       </div>
     </div>
   </div>`;
+}
+
+function renderError(error: string | ClientError | undefined): Hole {
+  if (error === undefined) return html``;
+  if (typeof error === "string") {
+    return html`<p class="error visible">Error: <i>${error}</i></p>`;
+  }
+  return error.render();
 }

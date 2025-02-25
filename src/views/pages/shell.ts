@@ -57,7 +57,7 @@ export function shell({
 }
 
 function nav(hasPrev: boolean, prevDest: string) {
-  return html` <div id="nav">
+  return html`<div id="nav">
     ${hasPrev ? html`<a href="${prevDest}">Back</a>` : ""}
   </div>`;
 }

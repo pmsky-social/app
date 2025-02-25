@@ -17,6 +17,19 @@ export class AllowedUsersRepository {
       .then((rows) => rows.map((row) => row.subject));
   }
 
+  async userIsWhitelisted(did: string) {
+    return await this.ctx.db
+      .selectFrom("proposals as p")
+      .leftJoin("proposal_votes as pv", "pv.subject", "p.uri")
+      .select("p.subject")
+      .where("p.type", "=", ProposalType.ALLOWED_USER)
+      .where("p.subject", "=", did)
+      .groupBy("p.subject")
+      .having(sql`SUM(${sql.ref("pv.val")})`, ">", 0)
+      .executeTakeFirst()
+      .then((row) => !!row);
+  }
+
   async getProposalByUser(did: string) {
     return await this.ctx.db
       .selectFrom("proposals")
