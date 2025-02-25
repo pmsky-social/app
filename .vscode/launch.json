@@ -6,8 +6,23 @@
   "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/tsx",
   "console": "integratedTerminal",
   "internalConsoleOptions": "neverOpen",
-  "skipFiles": ["<node_internals>/**", "${workspaceFolder}/node_modules/**"],
+  "skipFiles": [
+    "<node_internals>/**",
+    "${workspaceFolder}/node_modules/**"
+  ],
   "configurations": [
+    {
+      "type": "node",
+      "nodeVersionHint": 22,
+      "request": "launch",
+      "name": "npm run dev",
+      "runtimeExecutable": "tsx",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "watch",
+        "src/index.ts",
+      ]
+    },
     {
       "command": "npm start",
       "name": "Run npm start",
