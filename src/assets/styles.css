@@ -142,7 +142,7 @@ button,
 button.secondary {
   color: var(--gray-3);
   background-color: var(--white);
-  border: 1.2px solid var(--gray-3);
+  border: 1.5px solid var(--gray-3);
 }
 
 button:not([disabled]).secondary:hover {
