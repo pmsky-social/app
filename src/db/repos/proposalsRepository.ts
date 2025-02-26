@@ -15,17 +15,10 @@ export class ProposalsRepository {
     const offset = page * pageSize;
     return await this.ctx.db
       .selectFrom("proposals as p")
-      .where("type", "=", proposalType)
+      .where("p.type", "=", proposalType)
       .orderBy("p.createdAt", "desc")
       .leftJoin("posts", "posts.uri", "p.subject")
       .leftJoin("proposal_votes", "proposal_votes.subject", "p.uri")
-      .leftJoin("user_votes", "user_votes.subject", "p.uri")
-      .where((eb) =>
-        eb.or([
-          eb("user_votes.src", "=", userDid),
-          eb("user_votes.src", "is", null),
-        ])
-      )
       .groupBy("p.uri")
       .limit(pageSize)
       .offset(offset)
@@ -41,9 +34,13 @@ export class ProposalsRepository {
         "p.indexedBy",
         "posts.embed",
         sql<number>`SUM(${sql.ref("proposal_votes.val")})`.as("score"),
-        sql<boolean>`case when ${sql.ref("user_votes.src")} is null then false else true end`.as(
-          "alreadyVoted"
-        ),
+        sql<boolean>`
+        CASE WHEN EXISTS (
+          SELECT 1 FROM user_votes uv 
+          WHERE uv.subject = p.uri 
+            AND uv.src = ${userDid}
+        ) THEN true ELSE false END
+      `.as("alreadyVoted"),
       ])
       .execute()
       .then(
