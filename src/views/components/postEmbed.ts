@@ -34,7 +34,7 @@ export async function getCachedPostEmbed(ctx: AppContext, uri: string) {
 
 async function fetchAndCachePostEmbed(ctx: AppContext, uri: string) {
   try {
-    const embed = await getPostEmbed(uri);
+    const embed = await getPostEmbed(ctx, uri);
     await ctx.db
       .insertInto("posts")
       .values({ uri, embed })
@@ -49,14 +49,17 @@ async function fetchAndCachePostEmbed(ctx: AppContext, uri: string) {
   }
 }
 
-async function getPostEmbed(uri: string) {
+async function getPostEmbed(ctx: AppContext, uri: string) {
   const url = uri.startsWith("at://") ? bskyUrl(uri) : uri;
-  console.log("fetching embed for url: ", url);
+  ctx.logger.trace("fetching embed for url: ", url);
   const response = await fetch(
     `https://embed.bsky.app/oembed?url=${encodeURIComponent(url)}`
   );
-  if (!response.ok) throw new Error("Failed to fetch embed");
+  if (!response.ok) {
+    ctx.logger.error({ res: response }, "Failed to fetch embed");
+    throw new Error("Failed to fetch embed");
+  }
   const json = await response.json();
-  console.log("got embeddded post");
+  ctx.logger.trace("got embed for url: ", url);
   return json.html as string;
 }

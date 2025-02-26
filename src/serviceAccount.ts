@@ -60,22 +60,18 @@ export class AtprotoServiceAccount {
       },
     });
 
-    if (env.PUBLISH_TO_ATPROTO) {
-      const store = new SvcActCredsStore(db);
-      const session_data = await store.get(SVC_ACT_SESSION_KEY);
-      if (session_data) {
-        logger.trace("resuming svc account session");
-        await agent.resumeSession(session_data);
-      }
-      if (agent.did === undefined) {
-        logger.trace("creating session by logging in");
-        await agent.login({
-          identifier: SVC_ACT_EMAIL,
-          password: SVC_ACT_APP_PW,
-        });
-      }
-    } else {
-      logger.warn("PUBLISH_TO_ATPROTO off, not logging in");
+    const store = new SvcActCredsStore(db);
+    const session_data = await store.get(SVC_ACT_SESSION_KEY);
+    if (session_data) {
+      logger.trace("resuming svc account session");
+      await agent.resumeSession(session_data);
+    }
+    if (agent.did === undefined) {
+      logger.trace("creating session by logging in");
+      await agent.login({
+        identifier: SVC_ACT_EMAIL,
+        password: SVC_ACT_APP_PW,
+      });
     }
 
     return new AtprotoServiceAccount(agent, db, logger);
@@ -111,7 +107,7 @@ export class AtprotoServiceAccount {
         req,
         "PUBLISH_TO_ATPROTO off, would have published this record"
       );
-      uri = uuid();
+      uri = `at://${this.did()}/${collection}/${rkey}`;
     }
     return uri;
   }
@@ -273,12 +269,10 @@ export class AtprotoServiceAccount {
   }
 
   async fetchRecords(collection: string) {
-    // this.logger.trace({ collection }, "fetching records");
     const records = await this.agent.com.atproto.repo.listRecords({
       repo: this.did(),
       collection,
     });
-    // this.logger.trace({ records }, "got response");
     return records.data.records;
   }
 

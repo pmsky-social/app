@@ -85,6 +85,7 @@ function ProposePostLabelComponents(allowedLabelValues: string[]) {
           id="subject-input"
           name="subject"
           placeholder="Paste a link from Bsky..."
+          autofocus
           hx-post="/api/embedPost"
           hx-trigger="input changed delay:200ms"
           hx-target="#oembed-preview"
@@ -154,6 +155,7 @@ function ProposeAllowedUserComponents() {
       score, the user will be allowed to login.
     </p>
     <input
+      autofocus
       name="handle"
       type="text"
       name="handle"
