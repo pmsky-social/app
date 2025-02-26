@@ -2,7 +2,7 @@ import { proposalCard } from "#/views/components/labelCard";
 import { getCachedPostEmbed } from "#/views/components/postEmbed";
 import { Hole, html } from "#/lib/view";
 import { shell } from "./shell";
-import { Proposal, ProposalType } from "#/db/types";
+import { ProposalType } from "#/db/types";
 import { AppContext } from "#/index";
 import { feedButtons } from "../components/buttons";
 
@@ -45,7 +45,7 @@ export async function feedProposalFromDB(
     voted: row.alreadyVoted,
     embed: row.embed
       ? // @ts-ignore
-        html([embed])
+        html([row.embed])
       : row.type === ProposalType.POST_LABEL
         ? await getCachedPostEmbed(ctx, row.subject)
         : undefined,
@@ -64,18 +64,27 @@ type Props = {
   // didHandleMap: Record<string, string>;
   // profile: { displayName?: string };
   isMeta: boolean; // is the meta feed or not
+  pages: PagesProp;
+};
+
+type PagesProp = {
+  current: number;
+  hasNext: boolean;
+  hasPrev: boolean;
 };
 
 export function home(props: Props) {
   return shell({ path: [], title: "Home", content: content(props) });
 }
 
-function content({ proposals, isMeta }: Props) {
+function content({ proposals, isMeta, pages }: Props) {
   const pageName = isMeta ? "meta proposals" : "proposals";
   return html`
     <div class="container">
       ${feedButtons(pageName, isMeta)}
-      <div class="feed">${feed(proposals)}</div>
+      <div class="feed">
+        ${feed(proposals)}${paginationButtons(isMeta, pages)}
+      </div>
     </div>
   `;
 }
@@ -93,4 +102,20 @@ function feed(proposals: FeedProposal[]) {
     </p>`;
   }
   return html`${proposals.map(proposalCard)}`;
+}
+
+function paginationButtons(
+  isMeta: boolean,
+  { current, hasNext, hasPrev }: PagesProp
+) {
+  const nextHref = `/?meta=${isMeta}&page=${current + 1}`;
+  const prevHref = `/?meta=${isMeta}&page=${current - 1}`;
+  return html`<div class="pagination">
+    <a href=${prevHref}
+      ><button ?disabled=${!hasPrev} class="prev secondary">Previous</button></a
+    >
+    <a href=${nextHref}
+      ><button ?disabled=${!hasNext} class="next secondary">Next</button></a
+    >
+  </div>`;
 }

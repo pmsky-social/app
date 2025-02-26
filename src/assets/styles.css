@@ -140,11 +140,15 @@ button,
 
 
 button.secondary {
-  background-color: var(--gray-7);
+  color: var(--gray-3);
+  background-color: var(--white);
+  border: 1.2px solid var(--gray-3);
 }
 
 button:not([disabled]).secondary:hover {
-  background-color: var(--gray-5);
+  border-color: var(--black);
+  color: var(--black);
+  background-color: var(--gray-fa);
 }
 
 /*
@@ -319,6 +323,10 @@ form.vote {
 }
 
 form.vote button {
+  color: white;
+}
+
+form.vote button.score {
   color: var(--black);
 }
 
@@ -327,6 +335,7 @@ button[disabled].score {
   opacity: 1;
   cursor: default;
   background-color: var(--gray-d9);
+  border: none;
 }
 
 .voting-form .btn {
@@ -478,4 +487,9 @@ main {
     font-size: 1.3em;
     padding: 0.5em 1em;
   }
+}
+
+.feed .pagination {
+  display: flex;
+  justify-content: space-between;
 }
