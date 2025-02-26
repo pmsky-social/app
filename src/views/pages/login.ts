@@ -19,6 +19,7 @@ function content({ error }: Props) {
           name="handle"
           placeholder="Enter your handle (eg alice.bsky.social)"
           required
+          autofocus
         />
         <button type="submit">Log in</button>
       </form>

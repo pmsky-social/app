@@ -37,6 +37,7 @@ function ts(label: FeedProposal) {
 }
 
 // public so we can return this component from hx-POST /vote
+// subject: the uri of the proposal being voted on
 export function voting(subject: string, alreadyVoted: boolean, score: number) {
   score = Math.floor(score);
   return html`
