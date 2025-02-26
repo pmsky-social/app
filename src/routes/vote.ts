@@ -15,15 +15,15 @@ export class PostVote extends ContextualHandler {
       const { direction, uri, prevScore } = req.body;
       if (direction !== "up" && direction !== "down") {
         ctx.logger.warn({ direction }, "invalid vote direction");
-        return res.status(400);
+        return res.status(400).send(`invalid vote direction: ${direction}`);
       }
 
       let score;
       try {
         score = parseInt(prevScore);
       } catch (err) {
-        ctx.logger.warn({ err }, "invalid prevScore");
-        return res.status(400);
+        ctx.logger.warn({ err, prevScore }, "invalid prevScore");
+        return res.status(400).send(err);
       }
 
       const vote = direction === "up" ? 1 : -1;
