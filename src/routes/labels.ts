@@ -1,11 +1,7 @@
-import { embeddedPost } from "#/views/components/postEmbed";
-import { LabelRepository as ProposalRepository } from "#/db/repos/labelRepository";
-import { VoteRepository } from "#/db/repos/voteRepository";
 import { InvalidRecord, ProposalExists } from "#/error";
 import { page } from "#/lib/view";
 import { Proposal } from "#/views/pages/Label";
 import { createProposal } from "#/views/pages/createProposal";
-import { FeedProposal as FeedProposal } from "#/views/pages/home";
 import type { AppContext } from "..";
 import { ContextualHandler } from "./ContextualHandler";
 import { getSessionAgent } from "./util";
@@ -15,48 +11,30 @@ import { Agent } from "@atproto/api";
 import type express from "express";
 import { AllowedUsersRepository } from "#/db/repos/allowedUsersRepository";
 import { isValidHandle } from "@atproto/syntax";
+import { ProposalsRepository } from "#/db/repos/proposalsRepository";
 
 export class GetProposal extends ContextualHandler {
   constructor(ctx: AppContext) {
     super(ctx, async (req, res) => {
-      ctx.logger.trace(req.params, "got request to GET /proposal/:rkey");
-      ctx.logger.trace(req.query, "req.query");
       const alreadyExisted = req.query.error === "exists";
-      ctx.logger.trace(alreadyExisted, "already exists?");
       const agent = await getSessionAgent(req, res, ctx);
       if (!agent || !agent.did) return res.sendStatus(403); // TODO: redirect, or use auth middleware
 
-      const proposal = await new ProposalRepository(ctx.db).getProposal(
+      const proposal = await new ProposalsRepository(ctx).getHydratedProposal(
+        agent.assertDid,
         req.params.rkey
       );
-      if (!proposal) return res.sendStatus(404);
+      if (!proposal) {
+        this.ctx.logger.error(
+          { rkey: req.params.rkey },
+          "proposal not found for rkey"
+        );
+        return res.sendStatus(404);
+      }
 
-      const votes = new VoteRepository(ctx.db, ctx.logger);
-      const uri = `at://${proposal.src}/social.pmsky.label/${proposal.rkey}`;
-      const voted = await votes.userVotedAlready(agent.did, uri);
-      const score = await votes.getProposalScore(uri);
-
-      const embed =
-        proposal.type === ProposalType.POST_LABEL
-          ? await embeddedPost(ctx, proposal.subject)
-          : undefined;
-
-      const handle =
-        proposal.type === ProposalType.ALLOWED_USER
-          ? await ctx.resolver.resolveDidToHandle(proposal.subject)
-          : undefined;
-
-      const hydrated: FeedProposal = {
-        ...proposal,
-        uri,
-        voted,
-        score,
-        embed,
-        handle,
-      };
       return res
         .type("html")
-        .send(page(Proposal({ proposal: hydrated, alreadyExisted })));
+        .send(page(Proposal({ proposal, alreadyExisted })));
     });
   }
 }
