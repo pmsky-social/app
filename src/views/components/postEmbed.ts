@@ -52,9 +52,11 @@ async function fetchAndCachePostEmbed(ctx: AppContext, uri: string) {
       return html`<p class="error visible">Post not found: ${uri}</p>`;
     }
     if (e instanceof EmbedNotAuthorized) {
+      const href = bskyUrl(uri);
       return html`<p class="warn visible">
-        Embed not authorized to logged-out users, but a label can still be
-        proposed (this is a known issue): ${uri}
+        Embed not authorized to logged-out users, but labels can still be
+        proposed and voted on.
+        <a href="${href}" target="_blank">View the original post on bsky.</a>
       </p>`;
     }
     ctx.logger.error(e, "Failed getting or caching post embed");
