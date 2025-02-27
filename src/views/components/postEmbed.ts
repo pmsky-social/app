@@ -10,7 +10,6 @@ export async function embeddedPost(ctx: AppContext, uri: string) {
 }
 
 function bskyUrl(atUri: string) {
-  console.log("atUri: ", atUri);
   const pieces = atUri.split("/");
   const author = pieces[2];
   const postId = pieces[4];
