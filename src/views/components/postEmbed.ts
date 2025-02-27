@@ -1,3 +1,8 @@
+import {
+  EmbedNotAuthorized,
+  FetchEmbedBadResponse,
+  PostNotFound,
+} from "#/error";
 import { AppContext } from "#/index";
 import { html } from "#/lib/view";
 
@@ -10,7 +15,6 @@ export async function embeddedPost(ctx: AppContext, uri: string) {
 }
 
 function bskyUrl(atUri: string) {
-  console.log("atUri: ", atUri);
   const pieces = atUri.split("/");
   const author = pieces[2];
   const postId = pieces[4];
@@ -44,8 +48,19 @@ async function fetchAndCachePostEmbed(ctx: AppContext, uri: string) {
     // @ts-ignore
     return html([embed]);
   } catch (e) {
-    ctx.logger.error(e);
-    return html`<p>Failed to load post embed</p>`;
+    if (e instanceof PostNotFound) {
+      return html`<p class="error visible">Post not found: ${uri}</p>`;
+    }
+    if (e instanceof EmbedNotAuthorized) {
+      const href = bskyUrl(uri);
+      return html`<p class="warn visible">
+        Embed not authorized to logged-out users, but labels can still be
+        proposed and voted on.
+        <a href="${href}" target="_blank">View the original post on bsky.</a>
+      </p>`;
+    }
+    ctx.logger.error(e, "Failed getting or caching post embed");
+    return html`<p class="error visible">Failed to load post embed: ${e}</p>`;
   }
 }
 
@@ -56,8 +71,14 @@ async function getPostEmbed(ctx: AppContext, uri: string) {
     `https://embed.bsky.app/oembed?url=${encodeURIComponent(url)}`
   );
   if (!response.ok) {
+    if (response.status === 403) {
+      throw new EmbedNotAuthorized(uri);
+    }
+    if (response.status === 404) {
+      throw new PostNotFound(uri);
+    }
     ctx.logger.error({ res: response }, "Failed to fetch embed");
-    throw new Error("Failed to fetch embed");
+    throw new FetchEmbedBadResponse(response);
   }
   const json = await response.json();
   ctx.logger.trace("got embed for url: ", url);

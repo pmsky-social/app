@@ -26,6 +26,9 @@
   --primary-600: #0066db;
   --error-500: #f00;
   --error-100: #fee;
+  --warn-500: #330;
+  --warn-100: #ffc;
+  --warn-300: #ff0;
 
   --nc-lk-1: #0070F3
 }
@@ -154,15 +157,25 @@ button:not([disabled]).secondary:hover {
 /*
   Custom components
 */
-.error {
-  background-color: var(--error-100);
-  color: var(--error-500);
+.error,
+.warn {
   text-align: center;
   padding: 1rem;
   display: none;
 }
 
-.error.visible {
+.error {
+  background-color: var(--error-100);
+  color: var(--error-500);
+}
+
+.warn {
+  background-color: var(--warn-100);
+  border: 2px solid var(--warn-300);
+  color: var(--warn-500);
+}
+
+.visible {
   display: block;
 }
 

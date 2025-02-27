@@ -10,6 +10,12 @@ export class ProposalNotFound extends Error {
   }
 }
 
+export class PostNotFound extends Error {
+  constructor(private uri: string) {
+    super(`Post not found (uri=${uri})`);
+  }
+}
+
 export class ProposalExists extends Error {
   existingUri: string;
   constructor(proposalUri: string) {
@@ -33,5 +39,17 @@ export class AlreadyVoted extends Error {
 export class BadRequest extends Error {
   constructor(message: string) {
     super(`Bad request: ${message}`);
+  }
+}
+
+export class FetchEmbedBadResponse extends Error {
+  constructor(private response: Response) {
+    super(`Tried to fetch embed, got ${response.status}`);
+  }
+}
+
+export class EmbedNotAuthorized extends Error {
+  constructor(private uri: string) {
+    super(`Embed not authorized: ${uri}`);
   }
 }
