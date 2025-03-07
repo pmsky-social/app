@@ -10,15 +10,15 @@ import { CID } from 'multiformats/cid'
 export interface Record {
   /** the account creating the vote, not necessarily the same as the user who voted */
   src: string
-  /** AT URI of the record, repository (account), or other resource that this label applies to. */
+  /** AT URI of the record, repository (account), or other resource that this vote applies to. */
   uri: string
-  /** Optionally, CID specifying the specific version of 'uri' resource this label applies to. */
+  /** Optionally, CID specifying the specific version of 'uri' resource this vote applies to. */
   cid?: string
   /** The value of the vote, either +1 or -1 */
   val: number
-  /** Timestamp when this label was created. */
+  /** Timestamp when this vote was created. */
   cts: string
-  /** Signature of dag-cbor encoded label. */
+  /** Signature of dag-cbor encoded vote. */
   sig?: Uint8Array
   [k: string]: unknown
 }

@@ -17,12 +17,12 @@
                     "uri": {
                         "type": "string",
                         "format": "uri",
-                        "description": "AT URI of the record, repository (account), or other resource that this label applies to."
+                        "description": "AT URI of the record, repository (account), or other resource that this vote applies to."
                     },
                     "cid": {
                         "type": "string",
                         "format": "cid",
-                        "description": "Optionally, CID specifying the specific version of 'uri' resource this label applies to."
+                        "description": "Optionally, CID specifying the specific version of 'uri' resource this vote applies to."
                     },
                     "val": {
                         "type": "integer",
@@ -31,11 +31,11 @@
                     "cts": {
                         "type": "string",
                         "format": "datetime",
-                        "description": "Timestamp when this label was created."
+                        "description": "Timestamp when this vote was created."
                     },
                     "sig": {
                         "type": "bytes",
-                        "description": "Signature of dag-cbor encoded label."
+                        "description": "Signature of dag-cbor encoded vote."
                     }
                 },
                 "required": [

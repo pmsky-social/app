@@ -317,60 +317,60 @@ export const schemaDict = {
         record: {
           type: 'object',
           description:
-            'Replicates `com.atproto.label.defs#label, but as a concrete record type',
+            'Some proposal that refers to another ATproto record.  Similar to `com.atproto.proposal.defs#label, but as a concrete record type.',
           required: ['typ', 'src', 'uri', 'val', 'cts'],
           properties: {
             ver: {
               type: 'integer',
-              description: 'The AT Protocol version of the label object.',
+              description: 'The AT Protocol version of the proposal object.',
             },
             typ: {
               type: 'string',
               description:
-                "the type of proposal, currently expected values are 'allowed_user' or 'post_label'",
+                "the type of proposal, currently expected values are 'allowed_user' or 'post_proposal'",
             },
             src: {
               type: 'string',
               format: 'did',
-              description: 'DID of the actor who created this label.',
+              description: 'DID of the actor who created this proposal.',
             },
             uri: {
               type: 'string',
               format: 'uri',
               description:
-                'AT URI of the record, repository (account), or other resource that this label applies to.',
+                'AT URI of the record, repository (account), or other resource that this proposal applies to.',
             },
             cid: {
               type: 'string',
               format: 'cid',
               description:
-                "Optionally, CID specifying the specific version of 'uri' resource this label applies to.",
+                "Optionally, CID specifying the specific version of 'uri' resource this proposal applies to.",
             },
             val: {
               type: 'string',
               maxLength: 128,
               description:
-                'The short string name of the value or type of this label.',
+                'The short string name of the value or type of this proposal.',
             },
             neg: {
               type: 'boolean',
               description:
-                'If true, this is a negation label, overwriting a previous label.',
+                'If true, this is a negation of a proposal, overwriting a previous proposal.',
             },
             cts: {
               type: 'string',
               format: 'datetime',
-              description: 'Timestamp when this label was created.',
+              description: 'Timestamp when this proposal was created.',
             },
             exp: {
               type: 'string',
               format: 'datetime',
               description:
-                'Timestamp at which this label expires (no longer applies).',
+                'Timestamp at which this proposal expires (no longer applies).',
             },
             sig: {
               type: 'bytes',
-              description: 'Signature of dag-cbor encoded label.',
+              description: 'Signature of dag-cbor encoded proposal.',
             },
           },
         },
@@ -420,13 +420,13 @@ export const schemaDict = {
               type: 'string',
               format: 'uri',
               description:
-                'AT URI of the record, repository (account), or other resource that this label applies to.',
+                'AT URI of the record, repository (account), or other resource that this vote applies to.',
             },
             cid: {
               type: 'string',
               format: 'cid',
               description:
-                "Optionally, CID specifying the specific version of 'uri' resource this label applies to.",
+                "Optionally, CID specifying the specific version of 'uri' resource this vote applies to.",
             },
             val: {
               type: 'integer',
@@ -435,11 +435,11 @@ export const schemaDict = {
             cts: {
               type: 'string',
               format: 'datetime',
-              description: 'Timestamp when this label was created.',
+              description: 'Timestamp when this vote was created.',
             },
             sig: {
               type: 'bytes',
-              description: 'Signature of dag-cbor encoded label.',
+              description: 'Signature of dag-cbor encoded vote.',
             },
           },
           required: ['src', 'uri', 'val', 'cts'],
