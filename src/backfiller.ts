@@ -62,8 +62,11 @@ export class Backfiller {
   }
 
   async saveLabels(labels: Proposal[]) {
-    // this.logger.trace(labels, "saving labels");
-    await this.db
+   if (labels.length === 0) {
+      return
+   }
+   // this.logger.trace(labels, "saving labels");
+   await this.db
       .insertInto("proposals")
       .values(labels)
       .onConflict((oc) => oc.column("rkey").doNothing())
@@ -71,6 +74,9 @@ export class Backfiller {
   }
 
   async saveLabelVotes(votes: ProposalVote[]) {
+    if (votes.length === 0) {
+      return
+    }
     // this.logger.trace(votes, "saving votes");
     await this.db
       .insertInto("proposal_votes")
