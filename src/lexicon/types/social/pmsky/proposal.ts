@@ -6,11 +6,11 @@ import { lexicons } from '../../../lexicons'
 import { isObj, hasProp } from '../../../util'
 import { CID } from 'multiformats/cid'
 
-/** Some proposal that refers to another ATproto record.  Similar to `com.atproto.proposal.defs#label, but as a concrete record type. */
+/** A proposed moderation action (e.g. adding a label or annotation to a post). Refers to some other resource via URI (e.g. an atproto post). Superset of 'com.atproto.proposal.defs#label. */
 export interface Record {
   /** The AT Protocol version of the proposal object. */
   ver?: number
-  /** the type of proposal, currently expected values are 'allowed_user' or 'post_proposal' */
+  /** The type of moderation action being proposed. Currently expected values are 'allowed_user' or 'post_label' */
   typ: string
   /** DID of the actor who created this proposal. */
   src: string
@@ -18,8 +18,22 @@ export interface Record {
   uri: string
   /** Optionally, CID specifying the specific version of 'uri' resource this proposal applies to. */
   cid?: string
-  /** The short string name of the value or type of this proposal. */
+  /** For 'post_label' proposals, the short string name of the value of the proposed label. */
   val: string
+  /** For 'post_label' proposals where 'val' is '`readers-added-context', the full text of the proposed annotation (e.g. community note) to be shown below the post. */
+  note?: string
+  /** An optional array of predefined reasons justifying the moderation action. */
+  reasons?:
+    | 'factual_error'
+    | 'altered_media'
+    | 'outdated_information'
+    | 'misrepresentation_or_missing_context'
+    | 'unverified_claim_as_fact'
+    | 'joke_or_satire'
+    | 'other'
+    | (string & {})[]
+  /** The persistent, anonymous identifier for the user creating the proposal. */
+  aid?: string
   /** If true, this is a negation of a proposal, overwriting a previous proposal. */
   neg?: boolean
   /** Timestamp when this proposal was created. */

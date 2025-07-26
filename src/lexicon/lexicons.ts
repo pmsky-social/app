@@ -252,7 +252,7 @@ export const schemaDict = {
         record: {
           type: 'object',
           description:
-            'Replicates `com.atproto.label.defs#label, but as a concrete record type',
+            "Like `com.atproto.label.defs#label', but as a concrete record type, and with additional optional fields 'note' and 'proposal'.",
           required: ['src', 'uri', 'val', 'cts'],
           properties: {
             ver: {
@@ -281,6 +281,17 @@ export const schemaDict = {
               maxLength: 128,
               description:
                 'The short string name of the value or type of this label.',
+            },
+            note: {
+              type: 'string',
+              description:
+                'The full text of any annotation associated with this label. Only for `readers-added-context` labels.',
+            },
+            proposal: {
+              type: 'ref',
+              ref: 'lex:com.atproto.repo.strongRef',
+              description:
+                'A strong reference to the proposal that created this label.',
             },
             neg: {
               type: 'boolean',
@@ -317,7 +328,7 @@ export const schemaDict = {
         record: {
           type: 'object',
           description:
-            'Some proposal that refers to another ATproto record.  Similar to `com.atproto.proposal.defs#label, but as a concrete record type.',
+            "A proposed moderation action (e.g. adding a label or annotation to a post). Refers to some other resource via URI (e.g. an atproto post). Superset of 'com.atproto.proposal.defs#label.",
           required: ['typ', 'src', 'uri', 'val', 'cts'],
           properties: {
             ver: {
@@ -327,7 +338,7 @@ export const schemaDict = {
             typ: {
               type: 'string',
               description:
-                "the type of proposal, currently expected values are 'allowed_user' or 'post_proposal'",
+                "The type of moderation action being proposed. Currently expected values are 'allowed_user' or 'post_label'",
             },
             src: {
               type: 'string',
@@ -350,7 +361,34 @@ export const schemaDict = {
               type: 'string',
               maxLength: 128,
               description:
-                'The short string name of the value or type of this proposal.',
+                "For 'post_label' proposals, the short string name of the value of the proposed label.",
+            },
+            note: {
+              type: 'string',
+              description:
+                "For 'post_label' proposals where 'val' is '`readers-added-context', the full text of the proposed annotation (e.g. community note) to be shown below the post.",
+            },
+            reasons: {
+              type: 'array',
+              items: {
+                type: 'string',
+                knownValues: [
+                  'factual_error',
+                  'altered_media',
+                  'outdated_information',
+                  'misrepresentation_or_missing_context',
+                  'unverified_claim_as_fact',
+                  'joke_or_satire',
+                  'other',
+                ],
+              },
+              description:
+                'An optional array of predefined reasons justifying the moderation action.',
+            },
+            aid: {
+              type: 'string',
+              description:
+                'The persistent, anonymous identifier for the user creating the proposal.',
             },
             neg: {
               type: 'boolean',
@@ -408,7 +446,7 @@ export const schemaDict = {
         record: {
           type: 'object',
           description:
-            "a vote record, representing a user's agreement or disagreement with the referenced record, be it a label, post, or user.",
+            "A vote record, representing a user's approval or disapproval with the referenced resource. The resource my be a pmsky proposal, a bluesky post, a web page, or anything that can be agreed or disagreed with.",
           properties: {
             src: {
               type: 'string',
@@ -430,7 +468,38 @@ export const schemaDict = {
             },
             val: {
               type: 'integer',
-              description: 'The value of the vote, either +1 or -1',
+              description:
+                "The value of the vote. The exact meaning depends on what is being voted on, but generally '+1' means 'approval', -1 means 'disapproval', and 0 indicates 'neutrality'.",
+            },
+            reasons: {
+              type: 'array',
+              items: {
+                type: 'string',
+                knownValues: [
+                  'cites_high_quality_sources',
+                  'is_clear',
+                  'addresses_claim',
+                  'provides_important_context',
+                  'is_unbiased',
+                  'sources_missing_or_unreliable',
+                  'sources_dont_support_note',
+                  'is_incorrect',
+                  'is_opinion_or_speculation',
+                  'is_hard_to_understand',
+                  'is_off_topic_or_irrelevant',
+                  'is_argumentative_or_biased',
+                  'note_not_needed',
+                  'is_spam_harassment_or_abuse',
+                  'other',
+                ],
+              },
+              description:
+                'An optional array of predefined reasons justifying the rating.',
+            },
+            aid: {
+              type: 'string',
+              description:
+                'The persistent, anonymous identifier for the user casting the vote.',
             },
             cts: {
               type: 'string',

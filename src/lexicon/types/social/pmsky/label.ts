@@ -5,8 +5,9 @@ import { ValidationResult, BlobRef } from '@atproto/lexicon'
 import { lexicons } from '../../../lexicons'
 import { isObj, hasProp } from '../../../util'
 import { CID } from 'multiformats/cid'
+import * as ComAtprotoRepoStrongRef from '../../com/atproto/repo/strongRef'
 
-/** Replicates `com.atproto.label.defs#label, but as a concrete record type */
+/** Like `com.atproto.label.defs#label', but as a concrete record type, and with additional optional fields 'note' and 'proposal'. */
 export interface Record {
   /** The AT Protocol version of the label object. */
   ver?: number
@@ -18,6 +19,9 @@ export interface Record {
   cid?: string
   /** The short string name of the value or type of this label. */
   val: string
+  /** The full text of any annotation associated with this label. Only for `readers-added-context` labels. */
+  note?: string
+  proposal?: ComAtprotoRepoStrongRef.Main
   /** If true, this is a negation label, overwriting a previous label. */
   neg?: boolean
   /** Timestamp when this label was created. */
