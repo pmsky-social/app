@@ -46,7 +46,7 @@
                     },
                     "note": {
                         "type": "string",
-                        "description": "For 'post_label' proposals where 'val' is '`readers-added-context', the full text of the proposed annotation (e.g. community note) to be shown below the post."
+                        "description": "For 'post_label' proposals where 'val' is 'needs-context', the full text of the proposed annotation (e.g. community note) to be shown below the post."
                     },
                     "reasons": {
                         "type": "array",

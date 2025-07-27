@@ -285,7 +285,7 @@ export const schemaDict = {
             note: {
               type: 'string',
               description:
-                'The full text of any annotation associated with this label. Only for `readers-added-context` labels.',
+                'The full text of any annotation associated with this label. Only for `needs-context` labels.',
             },
             proposal: {
               type: 'ref',
@@ -366,7 +366,7 @@ export const schemaDict = {
             note: {
               type: 'string',
               description:
-                "For 'post_label' proposals where 'val' is '`readers-added-context', the full text of the proposed annotation (e.g. community note) to be shown below the post.",
+                "For 'post_label' proposals where 'val' is '`needs-context', the full text of the proposed annotation (e.g. community note) to be shown below the post.",
             },
             reasons: {
               type: 'array',

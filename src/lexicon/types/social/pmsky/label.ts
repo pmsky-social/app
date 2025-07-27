@@ -19,7 +19,7 @@ export interface Record {
   cid?: string
   /** The short string name of the value or type of this label. */
   val: string
-  /** The full text of any annotation associated with this label. Only for `readers-added-context` labels. */
+  /** The full text of any annotation associated with this label. Only for 'needs-context' labels. */
   note?: string
   proposal?: ComAtprotoRepoStrongRef.Main
   /** If true, this is a negation label, overwriting a previous label. */
