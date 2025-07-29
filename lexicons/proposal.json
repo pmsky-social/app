@@ -46,7 +46,7 @@
                     },
                     "note": {
                         "type": "string",
-                        "description": "For 'post_label' proposals where 'val' is 'needs-context', the full text of the proposed annotation (e.g. community note) to be shown below the post."
+                        "description": "For 'post_label' proposals where 'val' is 'needs-context', the full text of any proposed annotation (e.g. community note) to be shown below the post."
                     },
                     "reasons": {
                         "type": "array",
@@ -68,19 +68,10 @@
                         "type": "string",
                         "description": "The persistent, anonymous identifier for the user creating the proposal."
                     },
-                    "neg": {
-                        "type": "boolean",
-                        "description": "If true, this is a negation of a proposal, overwriting a previous proposal."
-                    },
                     "cts": {
                         "type": "string",
                         "format": "datetime",
                         "description": "Timestamp when this proposal was created."
-                    },
-                    "exp": {
-                        "type": "string",
-                        "format": "datetime",
-                        "description": "Timestamp at which this proposal expires (no longer applies)."
                     },
                     "sig": {
                         "type": "bytes",

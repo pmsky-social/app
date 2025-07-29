@@ -285,7 +285,7 @@ export const schemaDict = {
             note: {
               type: 'string',
               description:
-                'The full text of any annotation associated with this label. Only for `needs-context` labels.',
+                'The full text of any annotation associated with this label. Only for 'needs-context' labels.',
             },
             proposal: {
               type: 'ref',
