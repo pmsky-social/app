@@ -285,7 +285,7 @@ export const schemaDict = {
             note: {
               type: 'string',
               description:
-                'The full text of any annotation associated with this label. Only for 'needs-context' labels.',
+                "The full text of any annotation associated with this label. Only for 'needs-context' labels.",
             },
             proposal: {
               type: 'ref',
@@ -366,7 +366,7 @@ export const schemaDict = {
             note: {
               type: 'string',
               description:
-                "For 'post_label' proposals where 'val' is '`needs-context', the full text of the proposed annotation (e.g. community note) to be shown below the post.",
+                "For 'post_label' proposals where 'val' is 'needs-context', the full text of any proposed annotation (e.g. community note) to be shown below the post.",
             },
             reasons: {
               type: 'array',
@@ -390,21 +390,10 @@ export const schemaDict = {
               description:
                 'The persistent, anonymous identifier for the user creating the proposal.',
             },
-            neg: {
-              type: 'boolean',
-              description:
-                'If true, this is a negation of a proposal, overwriting a previous proposal.',
-            },
             cts: {
               type: 'string',
               format: 'datetime',
               description: 'Timestamp when this proposal was created.',
-            },
-            exp: {
-              type: 'string',
-              format: 'datetime',
-              description:
-                'Timestamp at which this proposal expires (no longer applies).',
             },
             sig: {
               type: 'bytes',

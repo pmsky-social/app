@@ -20,7 +20,7 @@ export interface Record {
   cid?: string
   /** For 'post_label' proposals, the short string name of the value of the proposed label. */
   val: string
-  /** For 'post_label' proposals where 'val' is '`needs-context', the full text of the proposed annotation (e.g. community note) to be shown below the post. */
+  /** For 'post_label' proposals where 'val' is 'needs-context', the full text of any proposed annotation (e.g. community note) to be shown below the post. */
   note?: string
   /** An optional array of predefined reasons justifying the moderation action. */
   reasons?:
@@ -34,12 +34,8 @@ export interface Record {
     | (string & {})[]
   /** The persistent, anonymous identifier for the user creating the proposal. */
   aid?: string
-  /** If true, this is a negation of a proposal, overwriting a previous proposal. */
-  neg?: boolean
   /** Timestamp when this proposal was created. */
   cts: string
-  /** Timestamp at which this proposal expires (no longer applies). */
-  exp?: string
   /** Signature of dag-cbor encoded proposal. */
   sig?: Uint8Array
   [k: string]: unknown
