@@ -7,7 +7,7 @@
             "key": "tid",
             "record": {
                 "type": "object",
-                "description": "A vote record, representing a user's approval or disapproval with the referenced resource. The resource my be a pmsky proposal, a bluesky post, a web page, or anything that can be agreed or disagreed with.",
+                "description": "A vote record, representing a user's approval or disapproval of the referenced resource. The resource my be a proposal, a post, a web page, or anything that can be agreed or disagreed with.",
                 "properties": {
                     "src": {
                         "type": "string",
@@ -33,7 +33,7 @@
                         "items": {
                             "type": "string"
                         },
-                        "description": "An optional array of predefined reasons justifying the rating."
+                        "description": "An optional array of predefined reasons justifying the vote."
                     },
                     "aid": {
                         "type": "string",
