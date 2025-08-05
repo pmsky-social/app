@@ -20,7 +20,7 @@ export function createProposal(props: Props) {
 
 function friendly(type: ProposalType) {
   switch (type) {
-    case ProposalType.POST_LABEL:
+    case ProposalType.LABEL:
       return "Label a post";
     case ProposalType.ALLOWED_USER:
       return "Invite a user";
@@ -72,7 +72,7 @@ function labelValueOption(labelValue: string) {
 
 function ProposePostLabelComponents(allowedLabelValues: string[]) {
   return html`
-    <div x-show="proposalType === 'post_label'">
+    <div x-show="proposalType === 'label'">
       <p class="create-help-text">
         Propose a label for a given post. This will submit a proposal to the
         <i>Main</i> feed, where users can agree or disagree with the proposed

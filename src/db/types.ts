@@ -10,12 +10,12 @@ export type DatabaseSchema = {
 };
 
 export enum ProposalType {
-  POST_LABEL = "post_label",
+  LABEL = "label",
   ALLOWED_USER = "allowed_user",
 }
 
 export const ALL_PROPOSAL_TYPES = [
-  ProposalType.POST_LABEL,
+  ProposalType.LABEL,
   ProposalType.ALLOWED_USER,
 ];
 

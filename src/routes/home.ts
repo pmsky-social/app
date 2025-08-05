@@ -22,7 +22,7 @@ export class GetHomePage extends ContextualHandler {
       let pageNumber = req.query.page ? parseInt(req.query.page) : 0;
       if (pageNumber < 0) pageNumber = 0;
       const pageSize = 10;
-      const type = isMeta ? ProposalType.ALLOWED_USER : ProposalType.POST_LABEL;
+      const type = isMeta ? ProposalType.ALLOWED_USER : ProposalType.LABEL;
       let proposals: FeedProposal[] = await new ProposalsRepository(
         ctx
       ).getProposals(agent.assertDid, type, pageSize, pageNumber);

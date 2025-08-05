@@ -5,9 +5,9 @@ import { ProposalType } from "#/db/types";
 export function proposalCard(proposal: FeedProposal) {
   const href = `/proposal/${proposal.rkey}`;
   const includeEmbed =
-    proposal.type == ProposalType.POST_LABEL && proposal.embed;
+    proposal.type == ProposalType.LABEL && proposal.embed;
   const title =
-    proposal.type == ProposalType.POST_LABEL
+    proposal.type == ProposalType.LABEL
       ? html`Label: <i>${proposal.val}</i>`
       : `${proposal.val} @${proposal.handle}`;
   return html`

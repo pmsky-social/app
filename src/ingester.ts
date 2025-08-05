@@ -126,7 +126,7 @@ async function saveLabel(
     .values({
       rkey: evt.commit.rkey.toString(),
       src: evt.did,
-      type: ProposalType.POST_LABEL,
+      type: ProposalType.LABEL,
       val: record.val,
       subject: record.uri,
       createdAt: record.cts,

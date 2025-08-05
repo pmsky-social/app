@@ -121,7 +121,7 @@ export class AtprotoServiceAccount {
     const rkey = TID.nextStr();
     const record: ProposalRecord = {
       $type: SOCIAL_PMSKY_PROPOSAL,
-      typ: ProposalType.POST_LABEL,
+      typ: ProposalType.LABEL,
       src: this.did(),
       uri: subject,
       val: label,
@@ -148,7 +148,7 @@ export class AtprotoServiceAccount {
         .values({
           rkey,
           src: record.src,
-          type: ProposalType.POST_LABEL,
+          type: ProposalType.LABEL,
           val: record.val,
           subject,
           createdAt: record.cts,
