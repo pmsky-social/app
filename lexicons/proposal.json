@@ -51,16 +51,7 @@
                     "reasons": {
                         "type": "array",
                         "items": {
-                            "type": "string",
-                            "knownValues": [
-                                "factual_error",
-                                "altered_media",
-                                "outdated_information",
-                                "misrepresentation_or_missing_context",
-                                "unverified_claim_as_fact",
-                                "joke_or_satire",
-                                "other"
-                            ]
+                            "type": "string"
                         },
                         "description": "An optional array of predefined reasons justifying the moderation action."
                     },
