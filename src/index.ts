@@ -4,118 +4,118 @@ import type { OAuthClient } from "@atproto/oauth-client-node";
 import express, { type Express } from "express";
 import { pino } from "pino";
 
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import type { Jetstream } from "@skyware/jetstream";
 import { createClient } from "#/auth/client";
 import { createDb, migrateToLatest } from "#/db/migrations";
 import type { Database } from "#/db/migrations";
 import {
-  type BidirectionalResolver,
-  createBidirectionalResolver,
-  createIdResolver,
+	type BidirectionalResolver,
+	createBidirectionalResolver,
+	createIdResolver,
 } from "#/id-resolver";
 import { createJetstreamIngester } from "#/ingester";
 import { env } from "#/lib/env";
 import { createRouter } from "#/routes/router";
-import { AtprotoServiceAccount } from "./serviceAccount";
 import { Backfiller } from "./backfiller";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { AtprotoServiceAccount } from "./serviceAccount";
 
 // Application state passed to the router and elsewhere
 export type AppContext = {
-  db: Database;
-  ingester: Jetstream | undefined; // TODO: remove undefined as an option once we stop testing off ATP
-  logger: pino.Logger;
-  oauthClient: OAuthClient;
-  resolver: BidirectionalResolver;
-  atSvcAct: AtprotoServiceAccount;
+	db: Database;
+	ingester: Jetstream | undefined; // TODO: remove undefined as an option once we stop testing off ATP
+	logger: pino.Logger;
+	oauthClient: OAuthClient;
+	resolver: BidirectionalResolver;
+	atSvcAct: AtprotoServiceAccount;
 };
 
 export class Server {
-  constructor(
-    public app: express.Application,
-    public server: http.Server,
-    public ctx: AppContext
-  ) {}
+	constructor(
+		public app: express.Application,
+		public server: http.Server,
+		public ctx: AppContext,
+	) {}
 
-  static async create() {
-    const { NODE_ENV, HOST, PORT, DB_PATH, LOG_LEVEL } = env;
-    const logger = pino({ name: "server start", level: LOG_LEVEL });
+	static async create() {
+		const { NODE_ENV, HOST, PORT, DB_PATH, LOG_LEVEL } = env;
+		const logger = pino({ name: "server start", level: LOG_LEVEL });
 
-    // Set up the SQLite database
-    const db = createDb(DB_PATH);
-    await migrateToLatest(db);
+		// Set up the SQLite database
+		const db = createDb(DB_PATH);
+		await migrateToLatest(db);
 
-    // Create the atproto utilities
-    const oauthClient = await createClient(db);
-    const baseIdResolver = createIdResolver();
-    const ingester = createJetstreamIngester(db, baseIdResolver);
-    const resolver = createBidirectionalResolver(baseIdResolver);
-    const atSvcAct = await AtprotoServiceAccount.create(db, logger);
-    const backfiller = new Backfiller(db, atSvcAct);
-    const ctx: AppContext = {
-      db,
-      ingester,
-      logger,
-      oauthClient,
-      resolver,
-      atSvcAct,
-    };
+		// Create the atproto utilities
+		const oauthClient = await createClient(db);
+		const baseIdResolver = createIdResolver();
+		const ingester = createJetstreamIngester(db, baseIdResolver);
+		const resolver = createBidirectionalResolver(baseIdResolver);
+		const atSvcAct = await AtprotoServiceAccount.create(db, logger);
+		const backfiller = new Backfiller(db, atSvcAct);
+		const ctx: AppContext = {
+			db,
+			ingester,
+			logger,
+			oauthClient,
+			resolver,
+			atSvcAct,
+		};
 
-    // Subscribe to events on the firehose
-    await backfiller.run();
-    if (ingester) ingester.start();
+		// Subscribe to events on the firehose
+		await backfiller.run();
+		if (ingester) ingester.start();
 
-    // Create our server
-    const app: Express = express();
-    app.set("trust proxy", true);
+		// Create our server
+		const app: Express = express();
+		app.set("trust proxy", true);
 
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
+		const __filename = fileURLToPath(import.meta.url);
+		const __dirname = path.dirname(__filename);
 
-    // Routes & middlewares
-    const router = createRouter(ctx);
-    app.use(express.json());
-    app.use(express.urlencoded({ extended: true }));
-    app.use("/assets", express.static(path.join(__dirname, "assets")));
-    app.use(
-      "/favicon.ico",
-      express.static(path.join(__dirname, "favicon.ico"))
-    );
-    app.use(router);
-    app.use((_req, res) => res.sendStatus(404));
+		// Routes & middlewares
+		const router = createRouter(ctx);
+		app.use(express.json());
+		app.use(express.urlencoded({ extended: true }));
+		app.use("/assets", express.static(path.join(__dirname, "assets")));
+		app.use(
+			"/favicon.ico",
+			express.static(path.join(__dirname, "favicon.ico")),
+		);
+		app.use(router);
+		app.use((_req, res) => res.sendStatus(404));
 
-    // Bind our server to the port
-    const server = app.listen(env.PORT);
-    await events.once(server, "listening");
-    logger.info(`Server (${NODE_ENV}) running on port http://${HOST}:${PORT}`);
+		// Bind our server to the port
+		const server = app.listen(env.PORT);
+		await events.once(server, "listening");
+		logger.info(`Server (${NODE_ENV}) running on port http://${HOST}:${PORT}`);
 
-    return new Server(app, server, ctx);
-  }
+		return new Server(app, server, ctx);
+	}
 
-  async close() {
-    this.ctx.logger.info("sigint received, shutting down");
-    if (this.ctx.ingester) await this.ctx.ingester.close();
-    return new Promise<void>((resolve) => {
-      this.server.close(() => {
-        this.ctx.logger.info("server closed");
-        resolve();
-      });
-    });
-  }
+	async close() {
+		this.ctx.logger.info("sigint received, shutting down");
+		if (this.ctx.ingester) await this.ctx.ingester.close();
+		return new Promise<void>((resolve) => {
+			this.server.close(() => {
+				this.ctx.logger.info("server closed");
+				resolve();
+			});
+		});
+	}
 }
 
 const run = async () => {
-  const server = await Server.create();
+	const server = await Server.create();
 
-  const onCloseSignal = async () => {
-    setTimeout(() => process.exit(1), 10000).unref(); // Force shutdown after 10s
-    await server.close();
-    process.exit();
-  };
+	const onCloseSignal = async () => {
+		setTimeout(() => process.exit(1), 10000).unref(); // Force shutdown after 10s
+		await server.close();
+		process.exit();
+	};
 
-  process.on("SIGINT", onCloseSignal);
-  process.on("SIGTERM", onCloseSignal);
+	process.on("SIGINT", onCloseSignal);
+	process.on("SIGTERM", onCloseSignal);
 };
 
 run();

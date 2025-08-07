@@ -1,24 +1,24 @@
 import { type Hole, html } from "#/lib/view";
 
 export function shell({
-  path,
-  title,
-  msg,
-  content,
+	path,
+	title,
+	msg,
+	content,
 }: {
-  path: string[];
-  title: string;
-  msg?: string | Hole;
-  content: Hole;
+	path: string[];
+	title: string;
+	msg?: string | Hole;
+	content: Hole;
 }) {
-  const errorClass = msg ? "error visible" : "error";
-  const isLoggedIn = path[0] !== "login";
-  const hasPrev = path.length > 0 && isLoggedIn;
-  let prevDest;
-  if (hasPrev) {
-    prevDest = `/${path.slice(0, -1).join("/")}`;
-  }
-  return html`<html>
+	const errorClass = msg ? "error visible" : "error";
+	const isLoggedIn = path[0] !== "login";
+	const hasPrev = path.length > 0 && isLoggedIn;
+	let prevDest;
+	if (hasPrev) {
+		prevDest = `/${path.slice(0, -1).join("/")}`;
+	}
+	return html`<html>
     <head>
       <title>${title}</title>
       <link
@@ -57,13 +57,13 @@ export function shell({
 }
 
 function nav(hasPrev: boolean, prevDest: string) {
-  return html`<div id="nav">
+	return html`<div id="nav">
     ${hasPrev ? html`<a href="${prevDest}">Back</a>` : ""}
   </div>`;
 }
 
 function logout(isLoggedIn: boolean) {
-  return html`<button
+	return html`<button
     style=${!isLoggedIn ? "visibility: hidden;" : ""}
     title="Log out"
     class="logout"
