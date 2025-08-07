@@ -48,13 +48,13 @@ export class PostProposal extends ContextualHandler {
 
 			if (req.body.type === ProposalType.LABEL) {
 				return this.createPostLabelProposal(req, res, agent);
-			} else if (req.body.type === ProposalType.ALLOWED_USER) {
-				return this.createAllowedUserProposal(req, res, agent);
-			} else {
-				return res
-					.status(400)
-					.send(backToPageWithErrorMsg("invalid proposal type"));
 			}
+			if (req.body.type === ProposalType.ALLOWED_USER) {
+				return this.createAllowedUserProposal(req, res, agent);
+			}
+			return res
+				.status(400)
+				.send(backToPageWithErrorMsg("invalid proposal type"));
 		});
 	}
 
@@ -163,7 +163,7 @@ export class PostProposal extends ContextualHandler {
 				.type("html")
 				.send(
 					backToPageWithErrorMsg(
-						`Account not found`,
+						"Account not found",
 						ProposalType.ALLOWED_USER,
 					),
 				);

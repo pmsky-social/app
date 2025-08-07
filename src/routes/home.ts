@@ -27,9 +27,9 @@ export class GetHomePage extends ContextualHandler {
 				ctx,
 			).getProposals(agent.assertDid, type, pageSize, pageNumber);
 
-			let hasNextPage = proposals.length == pageSize;
+			let hasNextPage = proposals.length === pageSize;
 
-			if (pageNumber > 0 && proposals.length == 0) {
+			if (pageNumber > 0 && proposals.length === 0) {
 				// we just guess that there's another page if the previous page was full,
 				// so we might get an empty page if len(proposals) % pageSize == 0.
 				// if so, we just return the previous page & say there isn't a next page

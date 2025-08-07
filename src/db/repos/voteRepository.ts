@@ -43,7 +43,7 @@ export class VoteRepository {
 
 		const scores: { [uri: string]: number } = {};
 		votes.forEach((vote) => {
-			if ((vote.val as number) != 1 && vote.val != -1) {
+			if ((vote.val as number) !== 1 && vote.val !== -1) {
 				this.logger.error(vote, "unexpected vote value");
 			}
 			if (scores[vote.subject]) {

@@ -8,7 +8,7 @@ export class ClientError extends Error {
 
 export class HandleNotWhitelisted extends Error {
 	constructor(private handle: string) {
-		super(`handle is not whitelisted`);
+		super("handle is not whitelisted");
 	}
 
 	render(): Hole {
