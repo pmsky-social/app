@@ -1,11 +1,14 @@
 {
-	"$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
-	"linter": {
-		"include": ["src/**/*.ts"],
-		"rules": {
-			"style": {
-				"noInferrableTypes": "off"
-			}
-		}
-	}
+    "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+    "linter": {
+        "include": [
+            "src/**/*.ts",
+            "!src/lexicon/**/*.ts"
+        ],
+        "rules": {
+            "style": {
+                "noInferrableTypes": "off"
+            }
+        }
+    }
 }
