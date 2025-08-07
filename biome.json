@@ -2,8 +2,8 @@
     "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
     "linter": {
         "include": [
-            "src/**/*.ts",
-            "!src/lexicon/**/*.ts"
+            "!src/lexicon/**/*.ts",
+            "src/**/*.ts"
         ],
         "rules": {
             "style": {
