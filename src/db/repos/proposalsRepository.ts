@@ -28,8 +28,8 @@ export class ProposalsRepository {
 	async getProposals(
 		userDid: string,
 		proposalType: ProposalType | undefined,
-		pageSize = 10,
-		page = 0,
+		pageSize: number = 10,
+		page: number = 0,
 		rkey?: string | undefined,
 	): Promise<FeedProposal[]> {
 		const offset = page * pageSize;
