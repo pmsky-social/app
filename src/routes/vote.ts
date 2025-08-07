@@ -18,7 +18,7 @@ export class PostVote extends ContextualHandler {
 				return res.status(400).send(`invalid vote direction: ${direction}`);
 			}
 
-			let score;
+			let score: number;
 			try {
 				score = Number.parseInt(prevScore);
 			} catch (err) {

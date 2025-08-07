@@ -38,11 +38,11 @@ function ts(label: FeedProposal) {
 // public so we can return this component from hx-POST /vote
 // subject: the uri of the proposal being voted on
 export function voting(subject: string, alreadyVoted: boolean, score: number) {
-	score = Math.floor(score);
+	const rounded = Math.floor(score);
 	return html`
     <form class="vote">
       <input name="uri" value="${subject}" type="hidden" />
-      <input name="prevScore" value="${score}" type="hidden" />
+      <input name="prevScore" value="${rounded}" type="hidden" />
       <button
         ?disabled=${alreadyVoted}
         title=${alreadyVoted ? "Thanks for voting!" : "Agree"}

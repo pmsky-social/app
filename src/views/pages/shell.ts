@@ -14,7 +14,7 @@ export function shell({
 	const errorClass = msg ? "error visible" : "error";
 	const isLoggedIn = path[0] !== "login";
 	const hasPrev = path.length > 0 && isLoggedIn;
-	let prevDest;
+	let prevDest: string;
 	if (hasPrev) {
 		prevDest = `/${path.slice(0, -1).join("/")}`;
 	}

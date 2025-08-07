@@ -163,10 +163,12 @@ export class RelayBackfiller {
 		this.firehose.start();
 	}
 
-	private handleEvent(event: any) {
+	// biome-ignore lint/suspicious/noExplicitAny: required by firehose
+	private handleEvent(event: any): void {
 		this.logger.trace(event, "got event");
 	}
 
+	// biome-ignore lint/suspicious/noExplicitAny: required by firehose
 	private handleError(err: any) {
 		this.logger.error(err, "got error");
 	}
