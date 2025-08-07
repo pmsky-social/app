@@ -1,16 +1,16 @@
-import { ClientError } from "#/errors";
-import { Hole, html } from "#/lib/view";
+import type { ClientError } from "#/errors";
+import { type Hole, html } from "#/lib/view";
 import { shell } from "./shell";
 
 type Props = { error?: string | ClientError };
 
 export function login(props: Props) {
-  return shell({ path: ["login"], title: "Log in", content: content(props) });
+	return shell({ path: ["login"], title: "Log in", content: content(props) });
 }
 
 function content({ error }: Props) {
-  const renderedError = renderError(error);
-  return html`<div id="root">
+	const renderedError = renderError(error);
+	return html`<div id="root">
     <div class="container">
       ${renderedError}
       <form action="/login" method="post" class="login">
@@ -32,9 +32,9 @@ function content({ error }: Props) {
 }
 
 function renderError(error: string | ClientError | undefined): Hole {
-  if (error === undefined) return html``;
-  if (typeof error === "string") {
-    return html`<p class="error visible">Error: <i>${error}</i></p>`;
-  }
-  return error.render();
+	if (error === undefined) return html``;
+	if (typeof error === "string") {
+		return html`<p class="error visible">Error: <i>${error}</i></p>`;
+	}
+	return error.render();
 }

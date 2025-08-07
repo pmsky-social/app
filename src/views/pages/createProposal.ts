@@ -4,40 +4,40 @@ import { metaLink } from "../components/buttons";
 import { shell } from "./shell";
 
 type Props = {
-  initProposalType?: ProposalType | undefined;
-  proposalTypes: ProposalType[];
-  allowedLabelValues: string[];
-  error?: string;
+	initProposalType?: ProposalType | undefined;
+	proposalTypes: ProposalType[];
+	allowedLabelValues: string[];
+	error?: string;
 };
 
 export function createProposal(props: Props) {
-  return shell({
-    path: ["createProposal"],
-    title: "Create Proposal",
-    content: content(props),
-  });
+	return shell({
+		path: ["createProposal"],
+		title: "Create Proposal",
+		content: content(props),
+	});
 }
 
 function friendly(type: ProposalType) {
-  switch (type) {
-    case ProposalType.LABEL:
-      return "Label a post";
-    case ProposalType.ALLOWED_USER:
-      return "Invite a user";
-    default:
-      throw new Error(`Unknown proposal type: ${type}`);
-  }
+	switch (type) {
+		case ProposalType.LABEL:
+			return "Label a post";
+		case ProposalType.ALLOWED_USER:
+			return "Invite a user";
+		default:
+			throw new Error(`Unknown proposal type: ${type}`);
+	}
 }
 
 function content({
-  error,
-  allowedLabelValues,
-  proposalTypes,
-  initProposalType,
+	error,
+	allowedLabelValues,
+	proposalTypes,
+	initProposalType,
 }: Props): Hole {
-  const init = initProposalType || "";
-  const xData = { proposalType: init };
-  return html`
+	const init = initProposalType || "";
+	const xData = { proposalType: init };
+	return html`
     <div class="container">
       ${error && html`<div class="error visible">${error}</div>`}
       <div>${metaLink(true)}</div>
@@ -51,8 +51,9 @@ function content({
           <select name="type" value="label" x-model="proposalType">
             <option value="">Select a type of proposal</option>
             ${proposalTypes.map(
-              (type) => html`<option value="${type}">${friendly(type)}</option>`
-            )}
+							(type) =>
+								html`<option value="${type}">${friendly(type)}</option>`,
+						)}
           </select>
 
           ${ProposePostLabelComponents(allowedLabelValues)}
@@ -67,11 +68,11 @@ function content({
 }
 
 function labelValueOption(labelValue: string) {
-  return html`<option value="${labelValue}">${labelValue}</option>`;
+	return html`<option value="${labelValue}">${labelValue}</option>`;
 }
 
 function ProposePostLabelComponents(allowedLabelValues: string[]) {
-  return html`
+	return html`
     <div x-show="proposalType === 'label'">
       <p class="create-help-text">
         Propose a label for a given post. This will submit a proposal to the
@@ -148,7 +149,7 @@ function ProposePostLabelComponents(allowedLabelValues: string[]) {
 }
 
 function ProposeAllowedUserComponents() {
-  return html`<div x-show="proposalType === 'allowed_user'">
+	return html`<div x-show="proposalType === 'allowed_user'">
     <p class="create-help-text">
       Invite a user by their handle (eg alice.bsky.social). This will create a
       proposal in the <i>Meta</i> feed. If the proposal has a non-negative

@@ -1,16 +1,15 @@
-import { FeedProposal } from "#/views/pages/home";
-import { html } from "#/lib/view";
 import { ProposalType } from "#/db/types";
+import { html } from "#/lib/view";
+import type { FeedProposal } from "#/views/pages/home";
 
 export function proposalCard(proposal: FeedProposal) {
-  const href = `/proposal/${proposal.rkey}`;
-  const includeEmbed =
-    proposal.type == ProposalType.LABEL && proposal.embed;
-  const title =
-    proposal.type == ProposalType.LABEL
-      ? html`Label: <i>${proposal.val}</i>`
-      : `${proposal.val} @${proposal.handle}`;
-  return html`
+	const href = `/proposal/${proposal.rkey}`;
+	const includeEmbed = proposal.type === ProposalType.LABEL && proposal.embed;
+	const title =
+		proposal.type === ProposalType.LABEL
+			? html`Label: <i>${proposal.val}</i>`
+			: `${proposal.val} @${proposal.handle}`;
+	return html`
     <div class="card">
       <a href="${href}">
         <div class="card-header">
@@ -30,20 +29,20 @@ export function proposalCard(proposal: FeedProposal) {
 }
 
 function ts(label: FeedProposal) {
-  const createdAt = new Date(label.createdAt);
-  const indexedAt = new Date(label.indexedAt);
-  if (createdAt < indexedAt) return createdAt.toDateString();
-  return indexedAt.toDateString();
+	const createdAt = new Date(label.createdAt);
+	const indexedAt = new Date(label.indexedAt);
+	if (createdAt < indexedAt) return createdAt.toDateString();
+	return indexedAt.toDateString();
 }
 
 // public so we can return this component from hx-POST /vote
 // subject: the uri of the proposal being voted on
 export function voting(subject: string, alreadyVoted: boolean, score: number) {
-  score = Math.floor(score);
-  return html`
+	const rounded = Math.floor(score);
+	return html`
     <form class="vote">
       <input name="uri" value="${subject}" type="hidden" />
-      <input name="prevScore" value="${score}" type="hidden" />
+      <input name="prevScore" value="${rounded}" type="hidden" />
       <button
         ?disabled=${alreadyVoted}
         title=${alreadyVoted ? "Thanks for voting!" : "Agree"}
