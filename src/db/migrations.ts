@@ -4,10 +4,11 @@ import {
   type Migration,
   type MigrationProvider,
   Migrator,
-  sql,
   SqliteDialect,
+  sql,
 } from "kysely";
-import { DatabaseSchema, ProposalType } from "./types";
+import { Proposal } from "#/views/pages/Label";
+import { type DatabaseSchema, ProposalType } from "./types";
 
 const migrationProvider: MigrationProvider = {
   async getMigrations() {
@@ -172,6 +173,15 @@ const migrations: Record<string, Migration> = {
           "uri",
           sql`CONCAT('at://did:plc:xhkqwjmxuo65vwbwuiz53qor/social.pmsky.label/', rkey)`
         )
+        .execute();
+    },
+  },
+  "010": {
+    async up(db: Kysely<DatabaseSchema>) {
+      await db
+        .updateTable("proposals")
+        .where("type", "!=", ProposalType.ALLOWED_USER)
+        .set("type", ProposalType.LABEL)
         .execute();
     },
   },
