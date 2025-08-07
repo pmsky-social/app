@@ -1,32 +1,31 @@
 import assert from "node:assert";
 import {
   type Agent,
+  AtpAgent,
   type AtpSessionData,
   type AtpSessionEvent,
-  AtpAgent,
 } from "@atproto/api";
 import { TID } from "@atproto/common";
 import type { Logger } from "pino";
-import { v4 as uuid } from "uuid";
 import { env } from "#/lib/env";
 import { SvcActCredsStore } from "./auth/storage";
 import { SOCIAL_PMSKY_PROPOSAL, SVC_ACT_SESSION_KEY } from "./constants";
 import type { Database } from "./db/migrations";
+import { VoteRepository } from "./db/repos/voteRepository";
+import { type Proposal, ProposalType } from "./db/types";
 import {
   AlreadyVoted,
   BadRequest,
   InvalidRecord,
   InvalidVote,
   ProposalExists,
-  ProposalNotFound as ProposalNotFound,
+  ProposalNotFound,
 } from "./error";
 import {
+  type Record as ProposalRecord,
   validateRecord as validateProposal,
-  Record as ProposalRecord,
 } from "./lexicon/types/social/pmsky/proposal";
-import { VoteRepository } from "./db/repos/voteRepository";
-import { Record as VoteRecord } from "./lexicon/types/social/pmsky/vote";
-import { Proposal, ProposalType } from "./db/types";
+import type { Record as VoteRecord } from "./lexicon/types/social/pmsky/vote";
 
 ///
 /// this agent is used to perform actions on behalf of the platform,

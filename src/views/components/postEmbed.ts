@@ -3,7 +3,7 @@ import {
   FetchEmbedBadResponse,
   PostNotFound,
 } from "#/error";
-import { AppContext } from "#/index";
+import type { AppContext } from "#/index";
 import { html } from "#/lib/view";
 
 export async function embeddedPost(ctx: AppContext, uri: string) {
