@@ -7,7 +7,7 @@
             "key": "tid",
             "record": {
                 "type": "object",
-                "description": "Like `com.atproto.label.defs#label', but as a concrete record type, and with additional optional fields 'note' and 'proposal'.",
+                "description": "Replicates `com.atproto.label.defs#label, but as a concrete record type",
                 "required": [
                     "src",
                     "uri",
@@ -38,15 +38,6 @@
                         "type": "string",
                         "maxLength": 128,
                         "description": "The short string name of the value or type of this label."
-                    },
-                    "note": {
-                        "type": "string",
-                        "description": "The full text of any annotation associated with this label. Only for 'needs-context' labels."
-                    },
-                    "proposal": {
-                        "type": "ref",
-                        "ref": "com.atproto.repo.strongRef",
-                        "description": "A strong reference to the proposal that created this label."
                     },
                     "neg": {
                         "type": "boolean",

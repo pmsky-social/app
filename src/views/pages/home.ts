@@ -46,7 +46,7 @@ export async function feedProposalFromDB(
     embed: row.embed
       ? // @ts-ignore
         html([row.embed])
-      : row.type === ProposalType.POST_LABEL
+      : row.type === ProposalType.LABEL
         ? await getCachedPostEmbed(ctx, row.subject)
         : undefined,
     score: row.score || 0,

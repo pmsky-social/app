@@ -46,7 +46,7 @@ export class PostProposal extends ContextualHandler {
       const agent = await getSessionAgent(req, res, ctx);
       if (!agent) return res.sendStatus(403);
 
-      if (req.body.type === ProposalType.POST_LABEL) {
+      if (req.body.type === ProposalType.LABEL) {
         return this.createPostLabelProposal(req, res, agent);
       } else if (req.body.type === ProposalType.ALLOWED_USER) {
         return this.createAllowedUserProposal(req, res, agent);
@@ -75,7 +75,7 @@ export class PostProposal extends ContextualHandler {
       return res
         .type("html")
         .send(
-          backToPageWithErrorMsg("label not allowed.", ProposalType.POST_LABEL)
+          backToPageWithErrorMsg("label not allowed.", ProposalType.LABEL)
         );
     }
 
@@ -89,7 +89,7 @@ export class PostProposal extends ContextualHandler {
           .send(
             backToPageWithErrorMsg(
               "expected AT URI or link to a bsky post.",
-              ProposalType.POST_LABEL
+              ProposalType.LABEL
             )
           );
       }
@@ -119,7 +119,7 @@ export class PostProposal extends ContextualHandler {
           .send(
             backToPageWithErrorMsg(
               "Label record failed validation",
-              ProposalType.POST_LABEL
+              ProposalType.LABEL
             )
           );
       }

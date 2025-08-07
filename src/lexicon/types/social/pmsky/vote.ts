@@ -6,7 +6,7 @@ import { lexicons } from '../../../lexicons'
 import { isObj, hasProp } from '../../../util'
 import { CID } from 'multiformats/cid'
 
-/** A vote record, representing a user's approval or disapproval with the referenced resource. The resource my be a pmsky proposal, a bluesky post, a web page, or anything that can be agreed or disagreed with. */
+/** A vote record, representing a user's approval or disapproval of the referenced resource. The resource my be a proposal, a post, a web page, or anything that can be agreed or disagreed with. */
 export interface Record {
   /** the account creating the vote, not necessarily the same as the user who voted */
   src: string
@@ -16,24 +16,8 @@ export interface Record {
   cid?: string
   /** The value of the vote. The exact meaning depends on what is being voted on, but generally '+1' means 'approval', -1 means 'disapproval', and 0 indicates 'neutrality'. */
   val: number
-  /** An optional array of predefined reasons justifying the rating. */
-  reasons?:
-    | 'cites_high_quality_sources'
-    | 'is_clear'
-    | 'addresses_claim'
-    | 'provides_important_context'
-    | 'is_unbiased'
-    | 'sources_missing_or_unreliable'
-    | 'sources_dont_support_note'
-    | 'is_incorrect'
-    | 'is_opinion_or_speculation'
-    | 'is_hard_to_understand'
-    | 'is_off_topic_or_irrelevant'
-    | 'is_argumentative_or_biased'
-    | 'note_not_needed'
-    | 'is_spam_harassment_or_abuse'
-    | 'other'
-    | (string & {})[]
+  /** An optional array of predefined reasons justifying the vote. */
+  reasons?: string[]
   /** The persistent, anonymous identifier for the user casting the vote. */
   aid?: string
   /** Timestamp when this vote was created. */

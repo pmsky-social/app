@@ -137,7 +137,7 @@ const migrations: Record<string, Migration> = {
       await db
         .updateTable("proposals")
         .where("type", "is", null)
-        .set("type", ProposalType.POST_LABEL)
+        .set("type", ProposalType.LABEL)
         .execute();
     },
   },

@@ -98,7 +98,7 @@ const transformLabel = (record: Record): Proposal => {
   return {
     rkey,
     src: val.src,
-    type: ProposalType.POST_LABEL,
+    type: ProposalType.LABEL,
     val: val.val,
     subject: val.uri,
     createdAt: val.cts,
